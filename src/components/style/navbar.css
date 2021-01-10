@@ -1,0 +1,56 @@
+.side-bar {
+    width: 200px;
+    padding-top: 30px;
+    border-right: 1px solid #ddd;
+    color: #909191;
+    font-size: 14px;
+    font-weight: 600;
+}
+.side-bar-bottom {
+    height: 50px;
+    justify-content: space-between;
+    border-bottom: 2px solid #fff;
+}
+.side-bar-bottom label {
+    padding: 10px 25px 6px 25px;
+}
+
+.side-bar-content {
+    overflow: auto;
+    flex: 1;
+    height: calc(100% - 50px);
+}
+.compose-button {
+    justify-content: space-evenly;
+    border-radius: 30px;
+    width: 148px;
+    height: 42px;
+    color: #909191;
+    font-size: 13px;
+    font-weight: 600;
+}
+.nav-item, .folder-nav-item, .bottom-nav, .bottom-logo, .mail-item {
+    display: none;
+}
+.item-wrapper {
+    color: #909191;
+}
+.item-wrapper label {
+    position: relative;
+}
+.item-info {
+    flex: 1;
+    justify-content: space-between;
+    padding-left: 16px;
+    font-weight: 600;
+    font-size: 14px;
+}
+#inbox:checked ~ .item-wrapper label[for="inbox"], #starred:checked ~ .item-wrapper label[for="starred"], #snoozed:checked ~ .item-wrapper label[for="snoozed"], #sent:checked ~ .item-wrapper label[for="sent"], #draft:checked ~ .item-wrapper label[for="draft"], #spam:checked ~ .item-wrapper label[for="spam"], #trash:checked ~ .item-wrapper label[for="trash"] {
+    background-color: var(--selected-background-color);
+    border-left: 3px solid var(--selected-items-color);
+    color: var(--selected-items-color);
+}
+#inbox:checked ~ .item-wrapper label[for="inbox"] svg, #starred:checked ~ .item-wrapper label[for="starred"] svg, #snoozed:checked ~ .item-wrapper label[for="snoozed"] svg, #sent:checked ~ .item-wrapper label[for="sent"] svg, #draft:checked ~ .item-wrapper label[for="draft"] svg, #spam:checked ~ .item-wrapper label[for="spam"] svg, #trash:checked ~ .item-wrapper label[for="trash"] svg {
+    color: var(--selected-items-color);
+}
+

@@ -1,0 +1,38 @@
+.tab-bar, .button-wrapper, .item-wrapper label, .section-header {
+    padding-left: 20px;
+    padding-right: 20px;
+}
+.tab-bar, .logo-wrapper, .left, .search-area, .right, .compose-button, .item-wrapper label, .item-info, .section-header, .side-bar-bottom, .action-bar, .action-bar .actions-right, .mail, .mail .mail-header, .subject-bar, .subject-bar .header-buttons, .subject-bar .header-buttons .header-button, .mail-content-wrapper .contact-info {
+    display: flex;
+    align-items: center;
+}
+.search-area {
+    width: 100%;
+    padding-left: 20px;;
+    margin-left: 3rem;
+    height: 34px;
+    border-radius: 6px;
+    padding: 1px;
+    
+}
+.search-area A {
+    flex: 1;
+    background: none;
+    border: none;
+    text-decoration: none;
+    color: #909191;
+    font-weight: 600;
+}
+A:visited:active{
+    text-decoration: underline;
+    color: #06388f;
+}
+A:hover {
+    text-decoration: underline;
+    color: #06388f;
+}
+.search-area input::placeholder {
+    font-weight: 400;
+    color: #909191;
+    font-size: 14px;
+}
