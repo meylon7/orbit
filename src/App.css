@@ -1,4 +1,5 @@
 
+ @import url("https://fonts.googleapis.com/css?family=Open+Sans:400,600,700,800&display=swap");
  html, body {
 	 font-family: "Open Sans", sans-serif;
 	 margin: 0;
@@ -60,7 +61,7 @@ svg{
 }
  .left {
 	 justify-content: space-between;
-	 width:70%;
+	 width: 44%;
 }
  
  .right {
@@ -78,7 +79,7 @@ svg{
 }
  
  .item-wrapper label {
-	 border-left: 3px solid #ccc;
+	 border-left: 3px solid white;
 }
  .item-wrapper label svg {
 	 color: var(--svg-current-color);
@@ -131,36 +132,12 @@ svg{
  #logo-1:checked ~ .label-wrapper label[for="logo-1"], #logo-2:checked ~ .label-wrapper label[for="logo-2"], #logo-3:checked ~ .label-wrapper label[for="logo-3"] {
 	 border-bottom: 4px solid var(--selected-items-color);
 }
-.info-panel{
-	/* height: 100%; */
-	width: 200px;
-	font-size:12px;
-    margin-top: 10px;
-    border-bottom: 1px solid #ddd;
-    justify-content: space-between;
-	padding: 10px;
-	margin-left: 20px;
-	text-overflow:ellipsis;
-}
-.list-group-item{
-	height: 35px;
-	padding-top: 5px;
-	border-bottom: #b7b8b8 solid 1px;
-	white-space: nowrap;
-	-o-text-overflow: ellipsis;
-	overflow: hidden;
-	text-overflow: ellipsis;
-}
-.info-panel span{
-	font-weight: 600;
-	color:#292a35
-}
  .action-bar {
-	height: 60px;
-	width: 360px;
-	border-bottom: 1px solid #ddd;
-	justify-content: space-between;
-	padding: 0 16px;
+	 height: 60px;
+	 width: 360px;
+	 border-bottom: 1px solid #ddd;
+	 justify-content: space-between;
+	 padding: 0 16px;
 }
  .action-bar .more .circle {
 	 background-color: #909191;
@@ -169,12 +146,10 @@ svg{
 	 border-radius: 50%;
 	 margin: 2px;
 }
-.conversations-list {
-	display: flex;
-	flex-direction: column;
-	border-left: 1px solid #ddd;
-	overflow: auto;
-	text-overflow:ellipsis;
+ .conversations-list {
+	 display: flex;
+	 flex-direction: column;
+	 border-right: 1px solid #ddd;
 }
  .mail-list {
 	 overflow: auto;
@@ -396,7 +371,7 @@ svg{
 }
  
  .content-wrapper {
-	 /* display: flex; */
+	 display: flex;
 	 padding: 10px;
 	 border: 1px solid #ddd;
 	 border-radius: 4px;
@@ -454,113 +429,92 @@ svg{
 	 margin-left: -40px;
 	 opacity: 0.4;
 }
-A {
-    flex: 1;
-    background: none;
-    border: none;
-    text-decoration: none;
-    color: #909191;
-    font-weight: 600;
+.ant-select-selection-item{
+	background-color: #f3bc2f !important;
+	border-radius: 5px !important;
+	color:rgb(27, 29, 63);
 }
-.steps-content {
-	margin-top: 16px;
-	background-repeat: no-repeat;
-	background-position: center 130px;
-	background-attachment: fixed;
-	background-color:#464646;
-	border: 1px dashed #e9e9e9;
-	border-radius: 2px;
-	background-color: #fafafa;
-	height: 510px;
-	max-height: 510px;
-	width:100%;
-	text-align: center;
-	padding-top: 80px;
-  }
-  
-  .steps-action {
-	margin-top: 24px;
-  }
-  [data-theme="dark"] .steps-content {
-	margin-top: 16px;
-	border: 1px dashed #303030;
-	background-color: rgba(255,255,255,0.04);
-	color: rgba(255,255,255,0.65);
-	padding-top: 80px;
-  }
-  .form__input{
-	font-family: 'Roboto', sans-serif;
-    color: #333;
-    margin: 0 auto;
-    border-radius: 0.2rem;
-    background-color: rgb(255, 255, 255);
-    border: 0.1rem solid #ccc;
-    width: 90%;
-    display: block;
-    transition: all 0.3s;
-  }
-  .ant-collapse-header{
-	  color:#fff !important;
-	  background-color:#1890ff ;
-  }
-  .ant-page-header-heading-title{
-	  color:rgb(3, 79, 132) !important;
-  }
-  .react-sanfona {
-	border: 1px solid #ccc;
-	border-radius: 3px;
-	margin-bottom: 70px;
-  }
-  
-  .react-sanfona-item-title {
-	background-color: #fafafa;
-	border-top: 1px solid #ccc;
-	color: #333;
-	padding: 20px;
-	text-transform: uppercase;
-	transition: background-color .3s;
-  }
-  
-  .react-sanfona-item:first-child .react-sanfona-item-title {
-	border-top: none;
-  }
-  
-  .react-sanfona-item-expanded .react-sanfona-item-title {
-	background-color:  rgb(39, 164, 254);
-	color: #fff;
-  }
-  .react-sanfona-item-expanded .react-sanfona-item-title.title-done-btn {
-		display: inline-block;
-		float: right;
-		color: #000;
-	}
-  .react-sanfona-item-body-wrapper {
-	color: #666;
-	padding: 20px;
-	position: relative;
-  }
-  
-  .react-sanfona-item-body-wrapper:hover .tooltip {
-	opacity: 1;
-  }
-  .ant-card-head{
-	  background-color: rgb(39, 164, 254) !important;
-	  color:#fff !important;
-  }
-  .divider-line{
-	height:20px;
-	width:100%;
+li{
+		line-height: 1.5em;
+		list-style-image: url(https://s3-us-west-2.amazonaws.com/s.cdpn.io/4621/treehouse-marker.png);
 }
 footer {
     position: fixed;
     bottom: 0;
-    height: 25px;
+    height: 30px;
 	width: 100%;
+	border-top:solid 1px #ddd;
     overflow:hidden;
-	text-align:center;
-	color: #fff;
-	background-color:#40a9ff;
 }
-.timer{
-	color:rgb(3, 79, 132);
+.nasaId {
+	text-align: center;
+	white-space: nowrap;
+	width: 200px;
+	overflow: hidden;
+	text-overflow: ellipsis;
+  }
+  .Imagecontainer {
+	display: flex;
+	justify-content: center;
+	align-content: center;
+	margin: 1rem;
+  }
+  .button {
+	transition-duration: 0.4s;
+	width: 100px;
+	padding: 0.5rem;
+	margin: 1rem;
+	background-color: white;
+	color: black;
+	border: 2px solid #1890ff; /* Green */
+  }
+  
+  .button:hover {
+	background-color: #1890ff; /* Green */
+	color: white;
+  }
+  
+  .button:disabled {
+	opacity: 0.6;
+  }
+  .fullImage {
+	width: 50%;
+	display: block;
+	margin-left: auto;
+	margin-right: auto;
+  }
+  .content {
+	padding: 10px;
+	border: 1px solid #ddd;
+	border-radius: 4px;
+	background: #fff;
+	background-image: url('components/images/Workspace3.png');
+	background-repeat: no-repeat;
+	background-position: center bottom;
+	margin-bottom: 10px;
+	min-height: 650px;
+	height: 100%;
+  }
+
+  .about{
+	font: 30px Tahoma, Helvetica, Arial, Sans-Serif;
+	text-align: center;
+	
+	color: #222; text-shadow: 0px 2px 3px #555;
 }
+
+.sub_about{
+	width: 500px; margin: 0 auto; background: #222; padding: 10px;
+	font-size: 22px; color: #555; text-shadow: 0px 2px 3px #171717;
+	
+	-webkit-box-shadow: 0px 2px 3px #555;
+	-moz-box-shadow: 0px 2px 3px #555;
+	-webkit-border-radius: 10px;
+	-moz-border-radius: 10px;
+	
+}
+.site-card-wrapper {
+	padding: 30px;
+	background: #ececec;
+	width: 100%;
+  }
