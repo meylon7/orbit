@@ -40,13 +40,13 @@ const Configuration = () => {
             <h1>Upload Configuration</h1>
           <Select
             style={{ width: 300 }}
-            placeholder="Select Configuration"
+            placeholder="Select from the list"
             onChange={onChange}
             onFocus={onFocus}
             onBlur={onBlur}
           >
-            <Option value="partial">Upload Partial Configuration</Option>
-            <Option value="full">Upload Full Configuration</Option>
+            {/* <Option value="partial">Upload Partial Configuration</Option> */}
+            <Option value="full">Upload Configuration</Option>
             <Option value="configuration">Download Configuration</Option>
           </Select>
           <br /> <br />

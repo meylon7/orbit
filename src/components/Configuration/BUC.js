@@ -53,7 +53,10 @@ const BUC = () => {
 
   var bucdata = [];
 
-  const[bucAttn, setBucAttn] = useState();
+  const [bucAttn, setBucAttn] = useState();
+  const [bucAttenShow, setBucAttenShow] = useState("none");
+  const [TxLo, setTxLo] = useState();
+
   const marks = {
     0: '0 [dB]',
     5: '5',
@@ -76,7 +79,7 @@ const BUC = () => {
   const fetchData = () => {
     axios
       .get(
-        "https://" + sysIPAddress + "/api/param/get?Parameters=PNC.RF.BUCMuteMinElev,BUC.MuteMinElevEn,PNC.RF.RSSIThresh,BUC.MuteRSSIThreshEn,BUC.MuteNotInPosEn,PNC.Buc.MuteFlags,PNC.BlockZoEn,PNC.Block0AzLo,PNC.Block0AzHi,PNC.Block0ElLo,PNC.Block0ElHi,PNC.Block1AzLo,PNC.Block1AzHi,PNC.Block1ElLo,PNC.Block1ElHi,PNC.Block2AzLo,PNC.Block2AzHi,PNC.Block2ElLo,PNC.Block2ElHi,PNC.Block3AzLo,PNC.Block3AzHi,PNC.Block3ElLo,PNC.Block3ElHi,BUC.TxStepAttn", 
+        "https://" + sysIPAddress + "/api/param/get?Parameters=BUC.TxLo,PNC.RF.BUCMuteMinElev,BUC.MuteMinElevEn,PNC.RF.RSSIThresh,BUC.MuteRSSIThreshEn,BUC.MuteNotInPosEn,PNC.Buc.MuteFlags,PNC.BlockZoEn,PNC.Block0AzLo,PNC.Block0AzHi,PNC.Block0ElLo,PNC.Block0ElHi,PNC.Block1AzLo,PNC.Block1AzHi,PNC.Block1ElLo,PNC.Block1ElHi,PNC.Block2AzLo,PNC.Block2AzHi,PNC.Block2ElLo,PNC.Block2ElHi,PNC.Block3AzLo,PNC.Block3AzHi,PNC.Block3ElLo,PNC.Block3ElHi,BUC.TxStepAttn", 
         {
           headers: {
             Authorization: "Bearer " + token,
@@ -128,6 +131,14 @@ const BUC = () => {
           setbz4ElHi(parseFloat(bucdata[0]["PNC.Block3ElHi"]).toFixed(3))
        
           setBucAttn(parseFloat(bucdata[0]["BUC.TxStepAttn"]).toFixed(3))
+          setTxLo(parseFloat(bucdata[0]["BUC.TxLo"]).toFixed(1))
+          if(bucdata[0]["BUC.TxLo"] !== null && bucdata[0]["BUC.TxLo"] !== undefined){
+            if(parseFloat(bucdata[0]["BUC.TxLo"]).toFixed(1) >= 29){
+              setBucAttenShow("block")
+            }else{
+              setBucAttenShow("none")
+            }
+          }
         });
       })
       .catch((error) => {
@@ -610,10 +621,10 @@ const BUC = () => {
         <canvas id="myCanvas" width="200" height="100" style={{width: '200', height: '200', border: '1px', color: 'black'}}></canvas>
         </Row>
       </div>     
-      <div className="content-wrapper">
+      <div className="content-wrapper" style={{ display: bucAttenShow }}>
         <PageHeader className="site-page-header" title="BUC Attenuation" />
       </div>
-      <div className="content-wrapper">
+      <div className="content-wrapper" style={{ display: bucAttenShow }}>
         <PageHeader className="site-page"/>
         <Row>
           <Col span={2}></Col>

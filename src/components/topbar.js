@@ -29,14 +29,15 @@ const Topbar = () => {
       setInfoData(data);
       setShowDisconnected(data === null? true:false)      
     }, [data],showDisconnected);
-    useEffect(() => {
-if(unsaved){
-  saveButtonColor = 'red'
-}
-else{
-  saveButtonColor = 'black'
-}
-    });
+    
+  useEffect(() => {
+    if (unsaved) {
+      saveButtonColor = 'red'
+    }
+    else {
+      saveButtonColor = 'black'
+    }
+  });
 
   function timeConverter(UNIX_timestamp) {
     let date
@@ -45,7 +46,7 @@ else{
       date = new Date(UNIX_timestamp);
       return date.toUTCString();
     }
-    else return "Server disconnected..."
+    else return "Trying to connect to the server..."
 
   }
     const LOGO = {
@@ -66,7 +67,7 @@ else{
           .then((response) => {
             console.log("Post", response.data.Parameters);
             setUnsaved(false)
-            message.success('success')
+            //message.success('Saved to memory')
           })
           .catch((error) => {
             console.error(error);
@@ -75,8 +76,12 @@ else{
     
   const resetAcuBuc = () => {
     if (window.confirm("You are about to reset Antenna. Are you sure?")) {
+      if(unsaved){
+        if(window.confirm("Save changes to memory?\nOtherwise they will be lost after the reboot")){
+          saveToMemory()
+        }
+      }
 
-      saveToMemory()
 
       const param = {
         MessageName: "HTMLFormUpdate",
@@ -110,7 +115,7 @@ else{
         })
         .then((response) => {
           console.log("Post", response.data.Parameters);
-          message.success('success')
+          message.success('Disconnecting...')
             removeToken('token')
             window.location.replace('/');
         })
@@ -201,14 +206,18 @@ else{
       })
 
 
-      saveToMemory()
+      if(unsaved){
+        if(window.confirm("Save changes to memory?\nOtherwise they will be lost after the reboot")){
+          saveToMemory()
+        }
+      }
+
     setTimeout(() => {
       if(resetBUCToAuto && resetACUToAuto){
         const PostValue = {
           UserName: user,
           Token: token,
         };
-        //console.log("https://" + sysIPAddress + "/api/logout", PostValue,{headers})
         axios
           .post("https://" + sysIPAddress + "/api/logout", PostValue, {
             headers: {
@@ -218,10 +227,6 @@ else{
   
           .then((res) => {
             console.log("Post", res.data.Parameters);
-            // sessionStorage.removeItem('token')
-            // sessionStorage.removeItem('user')
-            // removeToken('token')
-            // removeUser('user')
             sessionStorage.clear();
             window.location.replace('/');
           })
@@ -230,13 +235,11 @@ else{
             message.error("Logout failed")
           });
       }else{
-        // message.error("Couldn't switch to automatic state. Please try again...")
         if (window.confirm("Couldn't switch to automatic state. Proceed to logout anyway?")) {
            const PostValue = {
           UserName: user,
           Token: token,
         };
-        //console.log("https://" + sysIPAddress + "/api/logout", PostValue,{headers})
         axios
           .post("https://" + sysIPAddress + "/api/logout", PostValue, {
             headers: {
@@ -246,25 +249,20 @@ else{
   
           .then((res) => {
             console.log("Post", res.data.Parameters);
-            // sessionStorage.removeItem('token')
-            // sessionStorage.removeItem('user')
             removeToken('token')
             removeUser('user')
+            sessionStorage.clear();
             window.location.replace('/');
-            // window.location.reload(false);
             
           })
           .catch((error) => {
             console.error(error);
-            // message.error("Logout failed")
           });
 
-          // sessionStorage.removeItem('token')
-          // sessionStorage.removeItem('user')
           removeToken('token')
           removeUser('user')
+          sessionStorage.clear();
           window.location.replace('/');
-          // window.location.reload(false);
           }
 
       }
@@ -294,7 +292,7 @@ else{
             <span className="timer">{timeConverter(infoData["ARM.UTCTime"])} &nbsp;&nbsp;</span>
             { showDisconnected ? <span>
               
-            <Tooltip title="Disconnected from Server..." trigger="hover">
+            <Tooltip title="Trying to connect to the server..." trigger="hover">
                      <ApiTwoTone twoToneColor="#eb2f96"/>
             </Tooltip>
 

@@ -95,7 +95,7 @@ const App = () => {
     Token: token,
   };
   const LogOutSys = () => {
-    removeToken()
+    sessionStorage.clear();
     window.location.replace('/');
   }
   function connect() {
@@ -129,16 +129,17 @@ const App = () => {
        if (e.data !== undefined)
                message = JSON.parse(e.data)
       setSocketInfo(message);
-       console.log(message)
+      //console.log(message)
     };
-   
+
 
     ws.onclose = function (e) {
-      console.log('Socket is closed. Attempting to reconnect...', e.reason);
-      if (e.code == 1004 || e.code == 1006) {
+      if (e.code == 1004 || e.code == 1006 || e.code == 1002) {
         LogOutSys()
 
       } else {
+        console.log('Socket is closed. Attempting to reconnect...', e.reason);
+
         let timerId = setInterval(() => {
           if (ws) {
             clearInterval(timerId)
@@ -153,9 +154,9 @@ const App = () => {
 
     };
 
-    ws.onerror = function(err) {
+    ws.onerror = function (err) {
       console.error('Socket encountered error: ', err.message, 'Closing socket');
-      if(err.code === 1004 || err.code === 1006){
+      if (err.code === 1004 || err.code === 1006) {
         console.log('ws error, err = ',err)
         window.onbeforeunload = () => {
           localStorage.removeItem('token');

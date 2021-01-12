@@ -36,7 +36,7 @@ export default function About() {
         console.log(aboutdata)
         setAntennaVersion((aboutdata[0]['PNC.Sdu.stsdat.memval.uint13']+ '.'+aboutdata[0]['PNC.Sdu.stsdat.memval.uint14']+ '.'+aboutdata[0]['PNC.Sdu.stsdat.memval.uint15']))
         setAntennaSerial(aboutdata[0]['PNC.Sdu.stsdat.memval.uint12'])
-        setKpsuVersion((aboutdata[0]['PNC.SWVersion.Major']+ '.'+aboutdata[0]['PNC.SWVersion.Minor']+ '.'+aboutdata[0]['PNC.SWVersion.Build']))
+        setKpsuVersion((aboutdata[0]['SYS.Version']))
         setArmSerial(aboutdata[0]['ARM.Serial'])
         setBucFWVersion(aboutdata[0]['BUC.FirmwareRevision'])
         setBucSerial(aboutdata[0]['BUC.SerialNumber'])
