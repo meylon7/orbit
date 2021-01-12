@@ -19,6 +19,7 @@ import SystemControl from "./components/Maintenance/SystemControl";
 import SWUpdate from "./components/Maintenance/SWUpdate";
 import LOGS from "./components/Maintenance/LOGS";
 import Dashboard from "./components/Dashboard";
+import 'bootstrap/dist/css/bootstrap.min.css';
 const MAIN_AREA = {
   flex: 1,
   overflow: "auto",

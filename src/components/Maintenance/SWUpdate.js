@@ -2,7 +2,8 @@ import React, { useState, useEffect } from "react";
 import useSessionstorage from "@rooks/use-sessionstorage";
 import sysIPAddress from "../../location";
 import { PageHeader, Button, Space, Switch, Input, message } from "antd";
-import { UploadOutlined } from "@ant-design/icons";
+import Message from '../Message';
+import Progress from '../Progress';
 import axios from "axios";
 import FileUploaded from "./FileUploader";
 import { v4 as uuidv4 } from "uuid";
@@ -23,6 +24,13 @@ const SWUpdate = () => {
   const [counter, setCounter] = useState(1)
   const [fileToBeUpload, setFileToBeUpload] = useState({})
   const [selectedFile, setSelectedFile] = useState({})
+  //////////////
+  const [file, setFile] = useState('');
+  const [filename, setFilename] = useState('Choose File');
+  const [uploadedFile, setUploadedFile] = useState({});
+  const [message, setMessage] = useState('');
+  const [uploadPercentage, setUploadPercentage] = useState(0);
+  ///////////////
   const [beginingOfTheChunk, setBeginingOfTheChunk] = useState(0)
   const [endOfTheChunk, setEndOfTheChunk] = useState(chunkSize)
   const [progress, setProgress] = useState(0)
@@ -83,7 +91,7 @@ const SWUpdate = () => {
     }
   }, [fileToBeUpload, progress]);
 
-
+  
   const selectFile = (e) => {
     const _file = e.target.files[0];
     setSelectedFile(_file)
@@ -94,7 +102,6 @@ const SWUpdate = () => {
     }
   }
   const getFileContext = () => {
-
     resetChunkProperties();
     const _file = selectedFile;
     // setFileSize(_file.size)
@@ -134,6 +141,16 @@ const SWUpdate = () => {
         headers: {
           "content-type": "multipart/form-data",
           Authorization: "Bearer " + token,
+        },
+        onUploadProgress: progressEvent => {
+          setUploadPercentage(
+            parseInt(
+              Math.round((progressEvent.loaded * 100) / progressEvent.total)
+            )
+          );
+
+          // Clear percentage
+          setTimeout(() => setUploadPercentage(0), 10000);
         }
       }).then((res) => {
         console.log("uploadChunk data: ", res.data)
@@ -143,8 +160,7 @@ const SWUpdate = () => {
         }, 5000);
 
       });
-      // debugger
-
+      
     } catch (error) {
       debugger
       console.log('error', error)
@@ -287,15 +303,17 @@ const SWUpdate = () => {
                         onChange={selectFile}
                       />
                     </Form.Group>
-                    <Form.Group style={{ display: showProgress ? "block" : "none" }}>
-                      {progressInstance}
-                    </Form.Group>
+                    
                   </Form>
                 </Jumbotron>
+                
               </td>
               <td>
               </td>
               <td></td>
+            </tr>
+            <tr>
+              <td colSpan="3"><Progress percentage={uploadPercentage} /></td>
             </tr>
           </table>
         </div>
