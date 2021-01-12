@@ -15,7 +15,7 @@ const SWUpdate = () => {
   const [stbyversion, setStbyversion] = useState();
   const [name, setName] = useState("");
   var sysversion = [];
-  const chunkSize = 1048576 * 25;//  *3 is 3MB
+  const chunkSize = 1048576 * 25; //  *3 is 3MB
 
   const [showProgress, setShowProgress] = useState(false)
   const [ifFileSelected, setIfFileSelected] = useState(false)
@@ -81,7 +81,7 @@ const SWUpdate = () => {
     if (fileSize > 0) {
       fileUpload(counter);
     }
-  }, [fileToBeUpload, progress])
+  }, [fileToBeUpload, progress]);
 
   const selectFile = (e) => {
     const _file = e.target.files[0];
@@ -191,7 +191,7 @@ const SWUpdate = () => {
         headers: {
           "content-type": "multipart/form-data",
           Authorization: "Bearer " + token,
-        }
+        },
       })
       .then((res) => {
         LoadVersions()
@@ -199,8 +199,6 @@ const SWUpdate = () => {
       })
       .catch((err) => alert("File Upload Error"));
   };
-
-
 
   const activateForm = () => {
     if (window.confirm("After the activation the system will be rebooted automatically.")) {
@@ -253,7 +251,6 @@ const SWUpdate = () => {
 
   return (
     <>
-
       <div className="content-wrapper">
         <PageHeader className="site-page-header" title="SW Update" />
       </div>
@@ -275,7 +272,10 @@ const SWUpdate = () => {
             <tr>
               <td style={TD}>Standby SW Version</td>
               <td>
-                <label> <strong>{stbyversion}</strong></label>
+                <label>
+                  {" "}
+                  <strong>{stbyversion}</strong>
+                </label>
               </td>
               <td style={TD}>
 
@@ -315,4 +315,4 @@ const SWUpdate = () => {
   );
 };
 
-export default SWUpdate
+export default SWUpdate;
