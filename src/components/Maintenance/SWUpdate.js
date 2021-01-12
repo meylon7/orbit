@@ -83,6 +83,7 @@ const SWUpdate = () => {
     }
   }, [fileToBeUpload, progress]);
 
+
   const selectFile = (e) => {
     const _file = e.target.files[0];
     setSelectedFile(_file)
@@ -128,29 +129,22 @@ const SWUpdate = () => {
     try {
       // debugger
       let _chunk = fileToBeUpload;
-      const response = await axios.post("https://" + sysIPAddress + "/api/files/update.tar", _chunk, {
+      axios.post("https://" + sysIPAddress + "/api/files/update.tar", _chunk, {
 
         headers: {
           "content-type": "multipart/form-data",
           Authorization: "Bearer " + token,
         }
+      }).then((res) => {
+        console.log("uploadChunk data: ", res.data)
+        message.success("File is uploaded, start writing...")
+        setInterval(() => {
+          LoadVersions()
+        }, 5000);
+
       });
       // debugger
-      const data = response.data;
-      console.log("uploadChunk data: ", data)
-      if (data.isSuccess) {
-        setBeginingOfTheChunk(endOfTheChunk);
-        setEndOfTheChunk(endOfTheChunk + chunkSize);
-        if (counter == chunkCount) {
-          console.log('Process is complete, counter', counter)
-          await uploadCompleted();
-        } else {
-          var percentage = (counter / chunkCount) * 100;
-          setProgress(percentage);
-        }
-      } else {
-        console.log('Error Occurred:', data.errorMessage)
-      }
+
     } catch (error) {
       debugger
       console.log('error', error)
@@ -232,11 +226,6 @@ const SWUpdate = () => {
               })
               .then((response) => {
                 console.log("Post", response.data.Parameters);
-                message.success('success')
-                removeToken('token')
-                sessionStorage.clear();
-
-                window.location.replace('/');
               })
               .catch((error) => {
                 console.error(error);
