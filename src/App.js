@@ -24,7 +24,7 @@ const MAIN_AREA = {
   flex: 1,
   overflow: "auto",
   padding: "10px",
-  background: "#f7f8f9",
+  background: "#f7f8f9", 
 };
 export const SocketContext = createContext();
 const App = () => {

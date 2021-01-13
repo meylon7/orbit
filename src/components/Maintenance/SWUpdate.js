@@ -300,7 +300,7 @@ const SWUpdate = () => {
                     <Form.Group>
                       <Form.File
                         id="SelectedFile1"
-                        onChange={selectFile}
+                        onChange={selectFile} 
                       />
                     </Form.Group>
                     
