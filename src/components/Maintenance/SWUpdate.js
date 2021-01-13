@@ -8,6 +8,7 @@ import axios from "axios";
 import FileUploaded from "./FileUploader";
 import { v4 as uuidv4 } from "uuid";
 import { ProgressBar, Jumbotron, Form } from "react-bootstrap";
+import 'bootstrap/dist/css/bootstrap.min.css';
 
 const SWUpdate = () => {
   const [activeSW, setActiveSW] = useState(false);
@@ -37,7 +38,8 @@ const SWUpdate = () => {
   const [fileSize, setFileSize] = useState(0)
   const [chunkCount, setChunkCount] = useState(0)
   const progressInstance = <ProgressBar animated now={progress} label={`${progress}%`} />;
-
+  let activeVersion
+  let standbyVersion
   const headers = {
     "Access-Control-Origin": "*",
     //'Content-Type': 'text/plain',
@@ -64,10 +66,15 @@ const SWUpdate = () => {
               sysversion.push(res[key]);
             }
           });
-          let activeVersion = sysversion[0]["SYS.Version"] !== null ? sysversion[0]["SYS.Version"] : 'N/A'
-          let standbyVersion = sysversion[0]["SYS.StbyVersion"] !== null ? sysversion[0]["SYS.StbyVersion"] : 'N/A'
+          activeVersion = sysversion[0]["SYS.Version"] !== null ? sysversion[0]["SYS.Version"] : 'N/A'
+          standbyVersion = sysversion[0]["SYS.StbyVersion"] !== null ? sysversion[0]["SYS.StbyVersion"] : 'N/A'
+          console.log('sysversion[0]["SYS.Version"] = ', activeVersion)
+          console.log('sysversion[0]["SYS.StbyVersion"] = ', standbyVersion)
           setVersion(activeVersion);
           setStbyversion(standbyVersion);
+          console.log('version = ', version)
+          console.log('stbyversion = ', stbyversion)
+          
           if (standbyVersion !== 'N/A') {
             setIfStbyVersionUploaded(true)
           }
@@ -134,6 +141,8 @@ const SWUpdate = () => {
   const uploadChunk = async () => {
     try {
       // debugger
+      setIfFileSelected(false)
+      setIfStbyVersionUploaded(false)
       let _chunk = fileToBeUpload;
       axios.post("https://" + sysIPAddress + "/api/files/update.tar", _chunk, {
 
@@ -153,10 +162,56 @@ const SWUpdate = () => {
         }
       }).then((res) => {
         console.log("uploadChunk data: ", res.data)
-        setMessage("File is uploaded, start writing...")
+        setMessage("File is uploaded, start writing...It may take several minutes")
+        setStbyversion('N/A')
+        setUploadPercentage(0)
+        const timetotal = 420000 //7 minutes
+        let timeleft = 420000
         setInterval(() => {
-          LoadVersions()
-        }, 5000);
+          if(timeleft <= 0){
+            clearInterval()
+            setMessage("Standby version is installed successfully")
+            setUploadPercentage(100)
+          }else{
+            setUploadPercentage(parseInt(100 - Math.floor(timeleft*100/timetotal)))
+            timeleft -= 1000
+            axios
+            .get(
+              "https://" +
+              sysIPAddress +
+              "/api/param/get?Parameters=SYS.Version,SYS.StbyVersion",
+              {
+                headers: {
+                  "Content-Type": "text/plain",
+                  Authorization: "Bearer " + token,
+                },
+                mode: "cors",
+              }
+            )
+            .then((res) => {
+              Object.keys(res).map(function (key) {
+                if (!key.startsWith("Message")) {
+                  sysversion.push(res[key]);
+                }
+              });
+              activeVersion = sysversion[0]["SYS.Version"] !== null ? sysversion[0]["SYS.Version"] : 'N/A'
+              standbyVersion = sysversion[0]["SYS.StbyVersion"] !== null ? sysversion[0]["SYS.StbyVersion"] : 'N/A'
+              console.log('sysversion[0]["SYS.Version"] = ', activeVersion)
+              console.log('sysversion[0]["SYS.StbyVersion"] = ', standbyVersion)
+              setVersion(activeVersion);
+              setStbyversion(standbyVersion);
+              console.log('version = ', version)
+              console.log('stbyversion = ', stbyversion)
+              
+              if (standbyVersion !== 'N/A') {
+                setIfStbyVersionUploaded(true)
+              }
+              else {
+                setIfStbyVersionUploaded(false)
+              }
+            });
+          }
+        }, 1000);
 
       });
       
@@ -195,6 +250,7 @@ const SWUpdate = () => {
       setMessage('File Uploaded');
     }
   }
+
   const TD = {
     width: "200px",
   };
@@ -233,28 +289,7 @@ const SWUpdate = () => {
           }, mode: 'cors'
         })
         .then((response) => {
-          message.success("Version has been activated successfully");
-          const param1 = {
-            MessageName: "HTMLFormUpdate",
-            Parameters: {
-              "SYS.Reset": true
-            },
-          };
-          setTimeout(() => {
-            axios
-              .post("https://" + sysIPAddress + "/api/param/set", param1, {
-                headers: {
-                  Authorization: "Bearer " + token,
-                }, mode: 'cors'
-              })
-              .then((response) => {
-                console.log("Post", response.data.Parameters);
-              })
-              .catch((error) => {
-                console.error(error);
-              });
-          }, 3000);
-
+          console.log("Version has been activated successfully");
         })
         .catch((err) => alert("Version activation Error"));
     }
@@ -286,7 +321,7 @@ const SWUpdate = () => {
               <td>
                 <label>
                   {" "}
-                  <strong>{stbyversion}</strong>
+                  {stbyversion}
                 </label>
               </td>
               <td style={TD}>
