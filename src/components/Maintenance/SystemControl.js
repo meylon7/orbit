@@ -419,6 +419,8 @@ const SystemControl = () => {
   const LABEL = {
     fontWeight: "bold",
     color: "#034f84",
+    fontWeight: '600',
+    fontSize: '20px'
   };
 
   const setCurrentStep = (e) => {
@@ -582,7 +584,7 @@ const SystemControl = () => {
         <PageHeader className="site-page-header" title="System Control" />
       </div>
       <div className="content-wrapper">
-        <h2 style={LABEL}>ACU</h2>
+        <div style={LABEL}>ACU</div>
         <Accordion key={acuAutomatic} easing="ease" onChange={(e) => changeSysAutoManual(e.activeItems[0])}>
           <AccordionItem title="Automatic" expanded={automatic}>
             <Row width="100%">
@@ -832,7 +834,7 @@ const SystemControl = () => {
             </Row>
           </AccordionItem>
         </Accordion>
-        <h2 style={LABEL}>BUC MUTE</h2>
+        <div style={LABEL}>BUC MUTE</div>
         <Accordion accordion onChange={(e) => changeBucAutoManual(e.activeItems[0])}>
           <AccordionItem title="Automatic" expanded={automaticBUC}>
             {/* On “Manual” radio button selection:

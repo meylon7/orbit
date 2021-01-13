@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import useSessionstorage from "@rooks/use-sessionstorage";
 import sysIPAddress from "../../location";
-import { PageHeader, Button, Space, Switch, Input, message } from "antd";
+import { PageHeader, Button } from "antd";
 import Message from '../Message';
 import Progress from '../Progress';
 import axios from "axios";
@@ -25,9 +25,8 @@ const SWUpdate = () => {
   const [fileToBeUpload, setFileToBeUpload] = useState({})
   const [selectedFile, setSelectedFile] = useState({})
   //////////////
-  const [file, setFile] = useState('');
-  const [filename, setFilename] = useState('Choose File');
-  const [uploadedFile, setUploadedFile] = useState({});
+  // const [file, setFile] = useState('');
+  // const [filename, setFilename] = useState('Choose File');
   const [message, setMessage] = useState('');
   const [uploadPercentage, setUploadPercentage] = useState(0);
   ///////////////
@@ -150,11 +149,11 @@ const SWUpdate = () => {
           );
 
           // Clear percentage
-          setTimeout(() => setUploadPercentage(0), 10000);
+          setTimeout(() => setUploadPercentage(0), 600000);
         }
       }).then((res) => {
         console.log("uploadChunk data: ", res.data)
-        message.success("File is uploaded, start writing...")
+        setMessage("File is uploaded, start writing...")
         setInterval(() => {
           LoadVersions()
         }, 5000);
@@ -182,10 +181,18 @@ const SWUpdate = () => {
         },
         mode: "cors",
       }
-    );
+    ).catch(err => {
+      if (err.response.status === 500) {
+        setMessage('There was a problem with the server');
+      } else {
+        setMessage(err.response.data.msg);
+      }
+    })
+
     const data = response.data;
     if (data['SYS.StbyVersion'] !== null) {
       setProgress(100);
+      setMessage('File Uploaded');
     }
   }
   const TD = {
@@ -300,7 +307,7 @@ const SWUpdate = () => {
                     <Form.Group>
                       <Form.File
                         id="SelectedFile1"
-                        onChange={selectFile}
+                        onChange={selectFile} 
                       />
                     </Form.Group>
                     
@@ -314,6 +321,9 @@ const SWUpdate = () => {
             </tr>
             <tr>
               <td colSpan="3"><Progress percentage={uploadPercentage} /></td>
+            </tr>
+            <tr>
+              <td colspan="3">{message ? <Message msg={message} /> : null}</td>
             </tr>
           </table>
         </div>

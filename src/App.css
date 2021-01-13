@@ -13,8 +13,14 @@
 	 --svg-current-color: #909191;
 	 overflow: hidden;
 }
+h1{
+	font-size: 1.5rem !important;
+}
  h1, h2 {
 	 margin: 0;
+}
+.h3, h3 {
+    font-size: 1rem !important;
 }
 img{
 	border:none;
@@ -564,4 +570,10 @@ footer {
 }
 .timer{
 	color:rgb(3, 79, 132);
+}
+.jumbotron {
+    padding: 10px !important;
+    margin-bottom: 10px !important;
+    background-color: #fff !important;
+    border-radius: .3rem;
 }
