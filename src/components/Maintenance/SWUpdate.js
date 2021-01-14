@@ -221,64 +221,87 @@ const SWUpdate = () => {
         <PageHeader className="site-page-header" title="SW Update" />
       </div>
       <div className="content-wrapper">
-        <div style={{ padding: '30px' }}>
+        <div style={{ padding: "30px" }}>
           <table>
-            <tr style={{ color: 'rgb(3, 79, 132)' }}>
-              <td style={TD}>Active SW Version</td>
-              <td>
-                <label> <strong>{version}</strong></label>
-
-              </td>
-              <td></td>
-              <td></td>
-            </tr>
-            <tr style={{ height: '30px' }}>
-              <td colspan="4"></td>
-            </tr>
-            <tr>
-              <td style={TD}>Standby SW Version</td>
-              <td>
-                <label>
-                  {" "}
-                  {stbyversion}
-                </label>
-              </td>
-              <td style={TD}>
-
-              </td>
-              <td style={TD}>
-                <Button shape="round" onClick={getFileContext} disabled={!ifFileSelected}>Load Version</Button>
-              </td>
-              <td style={TD}>
-                <Button type="primary" shape="round" onClick={activateForm} disabled={!ifStbyVersionUploaded}>Activate Version</Button>
-              </td>
-            </tr>
-            <tr>
-              <td>
-                &nbsp;
-                <Jumbotron>
-                  <Form>
-                    <Form.Group>
-                      <Form.File
+            <thead></thead>
+            <tbody>
+              <tr style={{ color: "rgb(3, 79, 132)" }}>
+                <td style={TD}>Active SW Version</td>
+                <td>
+                  <label>
+                    {" "}
+                    <strong>{version}</strong>
+                  </label>
+                </td>
+                <td></td>
+                <td></td>
+              </tr>
+              <tr style={{ height: "30px" }}>
+                <td colSpan="4"></td>
+              </tr>
+              <tr>
+                <td style={TD}>Standby SW Version</td>
+                <td>
+                  <label>
+                    {" "}
+                    <strong>{stbyversion}</strong>
+                  </label>
+                </td>
+                <td style={TD}></td>
+                <td style={TD}>
+                  <Button
+                    shape="round"
+                    onClick={getFileContext}
+                    disabled={!ifFileSelected}
+                  >
+                    Load Version
+                  </Button>
+                </td>
+                <td style={TD}>
+                  <Button
+                    type="primary"
+                    shape="round"
+                    onClick={activateForm}
+                    disabled={!ifStbyVersionUploaded}
+                  >
+                    Activate Version
+                  </Button>
+                </td>
+              </tr>
+              <tr>
+                <td colSpan="2">
+                  &nbsp;
+                  <div class="input-group mb-3">
+                    <div class="input-group-prepend">
+                      <span class="input-group-text"></span>
+                    </div>
+                    <div class="custom-file">
+                      <input
+                        type="file"
+                        class="custom-file-input"
                         id="SelectedFile1"
-                        onChange={selectFile} 
+                        onChange={selectFile}
                       />
-                    </Form.Group>
-                    
-                  </Form>
-                </Jumbotron>
-                
-              </td>
-              <td>
-              </td>
-              <td></td>
-            </tr>
-            <tr>
-              <td colSpan="3"><Progress percentage={uploadPercentage} /></td>
-            </tr>
-            <tr>
-              <td colspan="3">{message ? <Message msg={message} /> : null}</td>
-            </tr>
+                      <label class="custom-file-label" for="inputGroupFile01">
+                        Choose file
+                      </label>
+                    </div>
+                  </div>
+                </td>
+                <td></td>
+                <td></td>
+              </tr>
+              <tr>
+                <td colSpan="4">
+                  <Progress percentage={uploadPercentage} />
+                </td>
+              </tr>
+              <tr>
+                <td colSpan="4">
+                  {message ? <Message msg={message} /> : null}
+                </td>
+              </tr>
+            </tbody>
           </table>
         </div>
       </div>
