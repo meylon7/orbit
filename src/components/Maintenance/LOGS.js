@@ -1,4 +1,4 @@
-import React from "react";
+import React, {useEffect, useState} from "react";
 import { PageHeader, Button } from "antd";
 import sysIPAddress from '../../location'
 import useSessionstorage from "@rooks/use-sessionstorage";
@@ -6,7 +6,51 @@ import axios from "axios";
 
 
 const LOGS = () => {
-const [token, setToken, removeToken] = useSessionstorage('token');
+const [token] = useSessionstorage('token');
+const [data, setData] = useState([]);
+const [logInfoData, setlogInfoData] = useState([]);
+let logInfo = []
+const [fileName, setfileName] = useState('')
+const [fileSize, setfileSize] = useState('')
+const [lastModified, setlastModified] = useState('')
+
+useEffect(() => {    
+  getLogInfo();
+  parseLogInfo();
+}, []);
+
+  const getLogInfo = () => {
+    axios.get("https://" + sysIPAddress + "/api/logging-info", {
+      headers: {
+        Authorization: "Bearer " + token,
+      }, mode: 'cors'
+    })
+      .then((res) => {
+        console.log("logging-info data: ",res)
+        data.push(res.data)
+        console.log("data = ",data)
+      })
+  }
+
+  const parseLogInfo = () =>{
+let keys = Object.keys(data[0])
+  }
+  const renderTableData = () => {
+    return data.map((logFile, index) => {
+        const { id, logObject } = logFile //destructuring
+        logObject.map((log_Object, i) =>{
+          return (
+            <tr key={i}>
+               <td>{log_Object.FileName}</td>
+               <td>{log_Object.FileSize}</td>
+               <td>{log_Object.ModifiedDate}</td>
+               <td>link</td>
+            </tr>
+         )
+        })
+
+    })
+ }
   const downloadLogs = () => {
 
 //     axios
@@ -26,18 +70,48 @@ const [token, setToken, removeToken] = useSessionstorage('token');
 //               a.click();
 //               window.location.href = response.url;
 //             });
+
+
+// data.map((item) => (
+                // <tr key={data.id}>
+                //   <td>{item.FileName}</td>
+                //   <td>{item.FileSize}</td>
+                //   <td>{item.ModifiedDate}</td>
+                //   <td>link</td>
+                //   <td />
+                // </tr>
+              // ))
 // });
 }
+
+
   return (
     <>
       <div className="content-wrapper">
         <PageHeader className="site-page-header" title="Logs" />
       </div>
       <div className="content-wrapper">
-        <div className="steps-content">
+        <table className="logInfo-table">
+          <thead>
+            <tr>
+            <th> Name</th>
+            <th> Date modified</th>
+            <th> Size</th>
+            <th> Download</th>
+            </tr>
+            {/* <li className='list-group-item'> <strong>System Control: </strong>{ManualEn}</li> */}
+          </thead>
+          <tbody>
+            
+              {renderTableData()}
+              
+            
+          </tbody>
+        </table>
+        {/* <div className="steps-content">
             <h1> Download Logs</h1>
             <Button type="primary" shape="round" onClick={downloadLogs}>Download file</Button>
-        </div>
+        </div> */}
       </div>
     </>
   );
