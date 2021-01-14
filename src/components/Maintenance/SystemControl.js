@@ -420,7 +420,7 @@ const SystemControl = () => {
     fontWeight: "bold",
     color: "#034f84",
     fontWeight: '600',
-    fontSize: '20px'
+    fontSize: '14px'
   };
 
   const setCurrentStep = (e) => {
