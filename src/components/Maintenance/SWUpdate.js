@@ -2,41 +2,40 @@ import React, { useState, useEffect } from "react";
 import useSessionstorage from "@rooks/use-sessionstorage";
 import sysIPAddress from "../../location";
 import { PageHeader, Button } from "antd";
-import Message from '../Message';
-import Progress from '../Progress';
+import Message from "../Message";
+import Progress from "../Progress";
 import axios from "axios";
-import FileUploaded from "./FileUploader";
 import { v4 as uuidv4 } from "uuid";
 import { ProgressBar, Jumbotron, Form } from "react-bootstrap";
 
+const TD = {
+  width: "200px",
+};
 const SWUpdate = () => {
   const [activeSW, setActiveSW] = useState(false);
-  const [token, setToken, removeToken] = useSessionstorage('token');
+  const [token, setToken, removeToken] = useSessionstorage("token");
   const [version, setVersion] = useState();
   const [stbyversion, setStbyversion] = useState();
   const [name, setName] = useState("");
   var sysversion = [];
   const chunkSize = 1048576 * 25; //  *3 is 3MB
 
-  const [showProgress, setShowProgress] = useState(false)
-  const [ifFileSelected, setIfFileSelected] = useState(false)
-  const [ifStbyVersionUploaded, setIfStbyVersionUploaded] = useState(false)
-  const [counter, setCounter] = useState(1)
-  const [fileToBeUpload, setFileToBeUpload] = useState({})
-  const [selectedFile, setSelectedFile] = useState({})
+  const [showProgress, setShowProgress] = useState(false);
+  const [ifFileSelected, setIfFileSelected] = useState(false);
+  const [ifStbyVersionUploaded, setIfStbyVersionUploaded] = useState(false);
+  const [counter, setCounter] = useState(1);
+  const [fileToBeUpload, setFileToBeUpload] = useState({});
+  const [selectedFile, setSelectedFile] = useState({});
   //////////////
-  // const [file, setFile] = useState('');
-  // const [filename, setFilename] = useState('Choose File');
-  const [message, setMessage] = useState('');
+  const [message, setMessage] = useState("");
   const [uploadPercentage, setUploadPercentage] = useState(0);
   ///////////////
-  const [beginingOfTheChunk, setBeginingOfTheChunk] = useState(0)
-  const [endOfTheChunk, setEndOfTheChunk] = useState(chunkSize)
-  const [progress, setProgress] = useState(0)
-  const [fileGuid, setFileGuid] = useState("")
-  const [fileSize, setFileSize] = useState(0)
-  const [chunkCount, setChunkCount] = useState(0)
-  const progressInstance = <ProgressBar animated now={progress} label={`${progress}%`} />;
+  const [beginingOfTheChunk, setBeginingOfTheChunk] = useState(0);
+  const [endOfTheChunk, setEndOfTheChunk] = useState(chunkSize);
+  const [progress, setProgress] = useState(0);
+  const [fileGuid, setFileGuid] = useState("");
+  const [fileSize, setFileSize] = useState(0);
+  const [chunkCount, setChunkCount] = useState(0);
 
   const headers = {
     "Access-Control-Origin": "*",
@@ -44,200 +43,153 @@ const SWUpdate = () => {
     Authorization: "Bearer " + token,
   };
   const LoadVersions = () => {
-   // setInterval(() => {
-      axios
-        .get(
-          "https://" +
+    // setInterval(() => {
+    axios
+      .get(
+        "https://" +
           sysIPAddress +
           "/api/param/get?Parameters=SYS.Version,SYS.StbyVersion",
-          {
-            headers: {
-              "Content-Type": "text/plain",
-              Authorization: "Bearer " + token,
-            },
-            mode: "cors",
-          }
-        )
-        .then((res) => {
-          Object.keys(res).map(function (key) {
-            if (!key.startsWith("Message")) {
-              sysversion.push(res[key]);
-            }
-          });
-          let activeVersion = sysversion[0]["SYS.Version"] !== null ? sysversion[0]["SYS.Version"] : 'N/A'
-          let standbyVersion = sysversion[0]["SYS.StbyVersion"] !== null ? sysversion[0]["SYS.StbyVersion"] : 'N/A'
-          setVersion(activeVersion);
-          setStbyversion(standbyVersion);
-          if (standbyVersion !== 'N/A') {
-            setIfStbyVersionUploaded(true)
-          }
-          else {
-            setIfStbyVersionUploaded(false)
+        {
+          headers: {
+            "Content-Type": "text/plain",
+            Authorization: "Bearer " + token,
+          },
+          mode: "cors",
+        }
+      )
+      .then((res) => {
+        Object.keys(res).map(function (key) {
+          if (!key.startsWith("Message")) {
+            sysversion.push(res[key]);
           }
         });
-   // }, 2000);
-
+        let activeVersion =
+          sysversion[0]["SYS.Version"] !== null 
+            ? sysversion[0]["SYS.Version"]
+            : "N/A";
+        let standbyVersion =
+          sysversion[0]["SYS.StbyVersion"] !== null && stbyversion !== "N/A"
+            ? sysversion[0]["SYS.StbyVersion"]
+            : "N/A";
+        setVersion(activeVersion);
+        setStbyversion(standbyVersion);
+        if (standbyVersion !== "N/A") {
+          setIfStbyVersionUploaded(true);
+        } else {
+          setIfStbyVersionUploaded(false);
+        }
+      });
   };
 
-  useEffect(() => {
-    LoadVersions()
-  }, [])
-
-
-  useEffect(() => {
-    if (fileSize > 0) {
-      fileUpload(counter);
-    }
-  }, [fileToBeUpload, progress]);
-
   
+
   const selectFile = (e) => {
     const _file = e.target.files[0];
-    setSelectedFile(_file)
+    setSelectedFile(_file);
     if (_file !== undefined) {
-      setIfFileSelected(true)
+      setIfFileSelected(true);
     } else {
-      setIfFileSelected(false)
+      setIfFileSelected(false);
     }
-  }
+  };
   const getFileContext = () => {
     resetChunkProperties();
     const _file = selectedFile;
     // setFileSize(_file.size)
-    setFileSize(selectedFile.size)
-    const _totalCount = _file.size % chunkSize == 0 ? _file.size / chunkSize : Math.floor(_file.size / chunkSize) + 1; // Total count of chunks will have been upload to finish the file
-    setChunkCount(_totalCount)
-    setFileToBeUpload(_file)
-    const _fileID = uuidv4() + "." + _file.name.split('.').pop();
-    setFileGuid(_fileID)
-  }
+    setFileSize(selectedFile.size);
+    const _totalCount =
+      _file.size % chunkSize == 0
+        ? _file.size / chunkSize
+        : Math.floor(_file.size / chunkSize) + 1; // Total count of chunks will have been upload to finish the file
+    setChunkCount(_totalCount);
+    setFileToBeUpload(_file);
+    const _fileID = uuidv4() + "." + _file.name.split(".").pop();
+    setFileGuid(_fileID);
+  };
 
   const resetChunkProperties = () => {
-    setShowProgress(true)
-    setProgress(0)
-    setCounter(1)
-    setBeginingOfTheChunk(0)
-    setEndOfTheChunk(chunkSize)
-  }
+    setShowProgress(true);
+    setProgress(0);
+    setCounter(1);
+    setBeginingOfTheChunk(0);
+    setEndOfTheChunk(chunkSize);
+  };
 
   const fileUpload = () => {
     setCounter(counter + 1);
     if (counter <= chunkCount) {
-      setFileToBeUpload(selectedFile)
+      setFileToBeUpload(selectedFile);
 
       var chunk = fileToBeUpload;
       // var chunk = fileToBeUpload.slice(beginingOfTheChunk, endOfTheChunk);
-      uploadChunk(chunk)
+      uploadChunk(chunk);
     }
-  }
+  };
 
   const uploadChunk = async () => {
     try {
       // debugger
       let _chunk = fileToBeUpload;
-      axios.post("https://" + sysIPAddress + "/api/files/update.tar", _chunk, {
+      axios
+        .post("https://" + sysIPAddress + "/api/files/update.tar", _chunk, {
+          headers: {
+            "content-type": "multipart/form-data",
+            Authorization: "Bearer " + token,
+          },
+          onUploadProgress: (progressEvent) => {
+            setUploadPercentage(
+              parseInt(
+                Math.round((progressEvent.loaded * 100) / progressEvent.total)
+              )
+            );
 
-        headers: {
-          "content-type": "multipart/form-data",
-          Authorization: "Bearer " + token,
-        },
-        onUploadProgress: progressEvent => {
-          setUploadPercentage(
-            parseInt(
-              Math.round((progressEvent.loaded * 100) / progressEvent.total)
-            )
-          );
-
-          // Clear percentage
-          setTimeout(() => setUploadPercentage(0), 600000);
-        }
-      }).then((res) => {
-        console.log("uploadChunk data: ", res.data)
-        setMessage("File is uploaded, start writing...")
-        setInterval(() => {
-          LoadVersions()
-        }, 5000);
-
-      });
-      
+            // Clear percentage
+            setTimeout(() => setUploadPercentage(0), 600000);
+          },
+        })
+        .then((res) => {
+          console.log("uploadChunk data: ", res.data);
+          setMessage("File is uploaded, start writing...");
+          const checkVersion = setInterval(() => {
+            LoadVersions();
+            if (stbyversion !== "N/A") {
+              setStbyversion(stbyversion);
+              clearInterval(checkVersion)
+            }
+          }, 5000);
+                  
+        });
     } catch (error) {
-      debugger
-      console.log('error', error)
+      debugger;
+      console.log("error", error);
     }
-  }
-
-
-  const uploadCompleted = async () => {
-    var formData = new FormData();
-    formData.append('update.tar', fileGuid);
-    const response = await axios.get(
-      "https://" +
-      sysIPAddress +
-      "/api/param/get?Parameters=SYS.StbyVersion",
-      {
-        headers: {
-          "Content-Type": "text/plain",
-          Authorization: "Bearer " + token,
-        },
-        mode: "cors",
-      }
-    ).catch(err => {
-      if (err.response.status === 500) {
-        setMessage('There was a problem with the server');
-      } else {
-        setMessage(err.response.data.msg);
-      }
-    })
-
-    const data = response.data;
-    if (data['SYS.StbyVersion'] !== null) {
-      setProgress(100);
-      setMessage('File Uploaded');
-    }
-  }
-  const TD = {
-    width: "200px",
-  };
-  const submitForm = () => {
-    const formData = new FormData();
-    formData.append("name", name);
-    formData.append("file", selectedFile);
-
-    axios
-      .post("https://" + sysIPAddress + "/api/files/update.tar", formData, {
-        headers: {
-          "content-type": "multipart/form-data",
-          Authorization: "Bearer " + token,
-        },
-      })
-      .then((res) => {
-        LoadVersions()
-        message.success("File Upload success");
-      })
-      .catch((err) => alert("File Upload Error"));
   };
 
   const activateForm = () => {
-    if (window.confirm("After the activation the system will be rebooted automatically.")) {
-
+    if (
+      window.confirm(
+        "After the activation the system will be rebooted automatically."
+      )
+    ) {
       const param = {
         MessageName: "HTMLFormUpdate",
         Parameters: {
-          "SYS.ActivateStbyVersion": true
+          "SYS.ActivateStbyVersion": true,
         },
       };
       axios
         .post("https://" + sysIPAddress + "/api/param/set", param, {
           headers: {
             Authorization: "Bearer " + token,
-          }, mode: 'cors'
+          },
+          mode: "cors",
         })
         .then((response) => {
           message.success("Version has been activated successfully");
           const param1 = {
             MessageName: "HTMLFormUpdate",
             Parameters: {
-              "SYS.Reset": true
+              "SYS.Reset": true,
             },
           };
           setTimeout(() => {
@@ -245,7 +197,8 @@ const SWUpdate = () => {
               .post("https://" + sysIPAddress + "/api/param/set", param1, {
                 headers: {
                   Authorization: "Bearer " + token,
-                }, mode: 'cors'
+                },
+                mode: "cors",
               })
               .then((response) => {
                 console.log("Post", response.data.Parameters);
@@ -254,77 +207,106 @@ const SWUpdate = () => {
                 console.error(error);
               });
           }, 3000);
-
         })
         .catch((err) => alert("Version activation Error"));
     }
-
   };
+useEffect(() => {
+    LoadVersions();
+  },[]);
 
+  useEffect(() => {
+    if (fileSize > 0) {
+      fileUpload(counter);
+    }
+  }, [fileToBeUpload, progress]);
   return (
     <>
       <div className="content-wrapper">
         <PageHeader className="site-page-header" title="SW Update" />
       </div>
       <div className="content-wrapper">
-        <div style={{ padding: '30px' }}>
+        <div style={{ padding: "30px" }}>
           <table>
-            <tr style={{ color: 'rgb(3, 79, 132)' }}>
-              <td style={TD}>Active SW Version</td>
-              <td>
-                <label> <strong>{version}</strong></label>
-
-              </td>
-              <td></td>
-              <td></td>
-            </tr>
-            <tr style={{ height: '30px' }}>
-              <td colspan="4"></td>
-            </tr>
-            <tr>
-              <td style={TD}>Standby SW Version</td>
-              <td>
-                <label>
-                  {" "}
-                  <strong>{stbyversion}</strong>
-                </label>
-              </td>
-              <td style={TD}>
-
-              </td>
-              <td style={TD}>
-                <Button shape="round" onClick={getFileContext} disabled={!ifFileSelected}>Load Version</Button>
-              </td>
-              <td style={TD}>
-                <Button type="primary" shape="round" onClick={activateForm} disabled={!ifStbyVersionUploaded}>Activate Version</Button>
-              </td>
-            </tr>
-            <tr>
-              <td>
-                &nbsp;
-                <Jumbotron>
-                  <Form>
-                    <Form.Group>
-                      <Form.File
+            <thead></thead>
+            <tbody>
+              <tr style={{ color: "rgb(3, 79, 132)" }}>
+                <td style={TD}>Active SW Version</td>
+                <td>
+                  <label>
+                    {" "}
+                    <strong>{version}</strong>
+                  </label>
+                </td>
+                <td></td>
+                <td></td>
+              </tr>
+              <tr style={{ height: "30px" }}>
+                <td colSpan="4"></td>
+              </tr>
+              <tr>
+                <td style={TD}>Standby SW Version</td>
+                <td>
+                  <label>
+                    {" "}
+                    <strong>{stbyversion}</strong>
+                  </label>
+                </td>
+                <td style={TD}></td>
+                <td style={TD}>
+                  <Button
+                    shape="round"
+                    onClick={getFileContext}
+                    disabled={!ifFileSelected}
+                  >
+                    Load Version
+                  </Button>
+                </td>
+                <td style={TD}>
+                  <Button
+                    type="primary"
+                    shape="round"
+                    onClick={activateForm}
+                    disabled={!ifStbyVersionUploaded}
+                  >
+                    Activate Version
+                  </Button>
+                </td>
+              </tr>
+              <tr>
+                <td colSpan="2">
+                  &nbsp;
+                  <div class="input-group mb-3">
+                    <div class="input-group-prepend">
+                      <span class="input-group-text">Upload</span>
+                    </div>
+                    <div class="custom-file">
+                      <input
+                        type="file"
+                        class="custom-file-input"
                         id="SelectedFile1"
-                        onChange={selectFile} 
+                        onChange={selectFile}
                       />
-                    </Form.Group>
-                    
-                  </Form>
-                </Jumbotron>
-                
-              </td>
-              <td>
-              </td>
-              <td></td>
-            </tr>
-            <tr>
-              <td colSpan="3"><Progress percentage={uploadPercentage} /></td>
-            </tr>
-            <tr>
-              <td colspan="3">{message ? <Message msg={message} /> : null}</td>
-            </tr>
+                      <label class="custom-file-label" for="inputGroupFile01">
+                        Choose file
+                      </label>
+                    </div>
+                  </div>
+                </td>
+                <td></td>
+                <td></td>
+              </tr>
+              <tr>
+                <td colSpan="4">
+                  <Progress percentage={uploadPercentage} />
+                </td>
+              </tr>
+              <tr>
+                <td colSpan="4">
+                  {message ? <Message msg={message} /> : null}
+                </td>
+              </tr>
+            </tbody>
           </table>
         </div>
       </div>
