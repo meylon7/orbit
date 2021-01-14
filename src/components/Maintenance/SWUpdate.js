@@ -2,13 +2,15 @@ import React, { useState, useEffect } from "react";
 import useSessionstorage from "@rooks/use-sessionstorage";
 import sysIPAddress from "../../location";
 import { PageHeader, Button } from "antd";
-import Message from '../Message';
-import Progress from '../Progress';
+import Message from "../Message";
+import Progress from "../Progress";
 import axios from "axios";
-import FileUploaded from "./FileUploader";
 import { v4 as uuidv4 } from "uuid";
 import { ProgressBar, Jumbotron, Form } from "react-bootstrap";
-import 'bootstrap/dist/css/bootstrap.min.css';
+
+const TD = {
+  width: "200px",
+};
 
 const SWUpdate = () => {
   const [activeSW, setActiveSW] = useState(false);
@@ -26,8 +28,6 @@ const SWUpdate = () => {
   const [fileToBeUpload, setFileToBeUpload] = useState({})
   const [selectedFile, setSelectedFile] = useState({})
   //////////////
-  // const [file, setFile] = useState('');
-  // const [filename, setFilename] = useState('Choose File');
   const [message, setMessage] = useState('');
   const [uploadPercentage, setUploadPercentage] = useState(0);
   ///////////////
@@ -37,9 +37,7 @@ const SWUpdate = () => {
   const [fileGuid, setFileGuid] = useState("")
   const [fileSize, setFileSize] = useState(0)
   const [chunkCount, setChunkCount] = useState(0)
-  const progressInstance = <ProgressBar animated now={progress} label={`${progress}%`} />;
-  let activeVersion
-  let standbyVersion
+
   const headers = {
     "Access-Control-Origin": "*",
     //'Content-Type': 'text/plain',
@@ -66,37 +64,26 @@ const SWUpdate = () => {
               sysversion.push(res[key]);
             }
           });
-          activeVersion = sysversion[0]["SYS.Version"] !== null ? sysversion[0]["SYS.Version"] : 'N/A'
-          standbyVersion = sysversion[0]["SYS.StbyVersion"] !== null ? sysversion[0]["SYS.StbyVersion"] : 'N/A'
-          console.log('sysversion[0]["SYS.Version"] = ', activeVersion)
-          console.log('sysversion[0]["SYS.StbyVersion"] = ', standbyVersion)
+          let activeVersion =
+            sysversion[0]["SYS.Version"] !== null 
+              ? sysversion[0]["SYS.Version"]
+              : "N/A";
+          let standbyVersion =
+            sysversion[0]["SYS.StbyVersion"] !== null && stbyversion !== "N/A"
+              ? sysversion[0]["SYS.StbyVersion"]
+              : "N/A";
           setVersion(activeVersion);
           setStbyversion(standbyVersion);
-          console.log('version = ', version)
-          console.log('stbyversion = ', stbyversion)
-          
-          if (standbyVersion !== 'N/A') {
-            setIfStbyVersionUploaded(true)
-          }
-          else {
-            setIfStbyVersionUploaded(false)
+          if (standbyVersion !== "N/A") {
+            setIfStbyVersionUploaded(true);
+          } else {
+            setIfStbyVersionUploaded(false);
           }
         });
-   // }, 2000);
 
   };
 
-  useEffect(() => {
-    LoadVersions()
-  }, [])
-
-
-  useEffect(() => {
-    if (fileSize > 0) {
-      fileUpload(counter);
-    }
-  }, [fileToBeUpload, progress]);
-
+  
   
   const selectFile = (e) => {
     const _file = e.target.files[0];
@@ -143,6 +130,7 @@ const SWUpdate = () => {
       // debugger
       setIfFileSelected(false)
       setIfStbyVersionUploaded(false)
+      setMessage("Uploading...")
       let _chunk = fileToBeUpload;
       axios.post("https://" + sysIPAddress + "/api/files/update.tar", _chunk, {
 
@@ -162,54 +150,25 @@ const SWUpdate = () => {
         }
       }).then((res) => {
         console.log("uploadChunk data: ", res.data)
-        setMessage("File is uploaded, start writing...It may take several minutes")
-        setStbyversion('N/A')
+        setMessage("Updating, please wait. It may take several minutes...")
         setUploadPercentage(0)
         const timetotal = 420000 //7 minutes
         let timeleft = 420000
-        setInterval(() => {
-          if(timeleft <= 0){
-            clearInterval()
+        const checkVersion = setInterval(() => {
+          setUploadPercentage(parseInt(100 - Math.floor(timeleft*100/timetotal)))
+          timeleft -= 1000
+          LoadVersions()
+
+          if(stbyversion !== "N/A"){
+            clearInterval(checkVersion)
+            setStbyversion(stbyversion);
             setMessage("Standby version is installed successfully")
             setUploadPercentage(100)
-          }else{
-            setUploadPercentage(parseInt(100 - Math.floor(timeleft*100/timetotal)))
-            timeleft -= 1000
-            axios
-            .get(
-              "https://" +
-              sysIPAddress +
-              "/api/param/get?Parameters=SYS.Version,SYS.StbyVersion",
-              {
-                headers: {
-                  "Content-Type": "text/plain",
-                  Authorization: "Bearer " + token,
-                },
-                mode: "cors",
-              }
-            )
-            .then((res) => {
-              Object.keys(res).map(function (key) {
-                if (!key.startsWith("Message")) {
-                  sysversion.push(res[key]);
-                }
-              });
-              activeVersion = sysversion[0]["SYS.Version"] !== null ? sysversion[0]["SYS.Version"] : 'N/A'
-              standbyVersion = sysversion[0]["SYS.StbyVersion"] !== null ? sysversion[0]["SYS.StbyVersion"] : 'N/A'
-              console.log('sysversion[0]["SYS.Version"] = ', activeVersion)
-              console.log('sysversion[0]["SYS.StbyVersion"] = ', standbyVersion)
-              setVersion(activeVersion);
-              setStbyversion(standbyVersion);
-              console.log('version = ', version)
-              console.log('stbyversion = ', stbyversion)
-              
-              if (standbyVersion !== 'N/A') {
-                setIfStbyVersionUploaded(true)
-              }
-              else {
-                setIfStbyVersionUploaded(false)
-              }
-            });
+          }else if ((timeleft <= 0) && (stbyversion === "N/A")) {
+            clearInterval(checkVersion)
+            setStbyversion(stbyversion);
+            setMessage("Failed to install standby version")
+            setUploadPercentage(0)
           }
         }, 1000);
 
@@ -222,59 +181,9 @@ const SWUpdate = () => {
   }
 
 
-  const uploadCompleted = async () => {
-    var formData = new FormData();
-    formData.append('update.tar', fileGuid);
-    const response = await axios.get(
-      "https://" +
-      sysIPAddress +
-      "/api/param/get?Parameters=SYS.StbyVersion",
-      {
-        headers: {
-          "Content-Type": "text/plain",
-          Authorization: "Bearer " + token,
-        },
-        mode: "cors",
-      }
-    ).catch(err => {
-      if (err.response.status === 500) {
-        setMessage('There was a problem with the server');
-      } else {
-        setMessage(err.response.data.msg);
-      }
-    })
-
-    const data = response.data;
-    if (data['SYS.StbyVersion'] !== null) {
-      setProgress(100);
-      setMessage('File Uploaded');
-    }
-  }
-
-  const TD = {
-    width: "200px",
-  };
-  const submitForm = () => {
-    const formData = new FormData();
-    formData.append("name", name);
-    formData.append("file", selectedFile);
-
-    axios
-      .post("https://" + sysIPAddress + "/api/files/update.tar", formData, {
-        headers: {
-          "content-type": "multipart/form-data",
-          Authorization: "Bearer " + token,
-        },
-      })
-      .then((res) => {
-        LoadVersions()
-        message.success("File Upload success");
-      })
-      .catch((err) => alert("File Upload Error"));
-  };
 
   const activateForm = () => {
-    if (window.confirm("After the activation the system will be rebooted automatically.")) {
+    if (window.confirm("After the activation the system will be rebooted automatically. Proceed?")) {
 
       const param = {
         MessageName: "HTMLFormUpdate",
@@ -295,6 +204,16 @@ const SWUpdate = () => {
     }
 
   };
+
+  useEffect(() => {
+    LoadVersions();
+  },[]);
+
+  useEffect(() => {
+    if (fileSize > 0) {
+      fileUpload(counter);
+    }
+  }, [fileToBeUpload, progress]);
 
   return (
     <>
