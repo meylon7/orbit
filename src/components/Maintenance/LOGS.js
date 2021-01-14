@@ -16,7 +16,6 @@ const [lastModified, setlastModified] = useState('')
 
 useEffect(() => {    
   getLogInfo();
-  parseLogInfo();
 }, []);
 
   const getLogInfo = () => {
@@ -32,22 +31,16 @@ useEffect(() => {
       })
   }
 
-  const parseLogInfo = () =>{
-let keys = Object.keys(data[0])
-  }
   const renderTableData = () => {
     return data.map((logFile, index) => {
-        const { id, logObject } = logFile //destructuring
-        logObject.map((log_Object, i) =>{
           return (
-            <tr key={i}>
-               <td>{log_Object.FileName}</td>
-               <td>{log_Object.FileSize}</td>
-               <td>{log_Object.ModifiedDate}</td>
+            <tr key={index}>
+               <td>{logFile.FileName}</td>
+               <td>{logFile.FileSize}</td>
+               <td>{logFile.ModifiedDate}</td>
                <td>link</td>
             </tr>
          )
-        })
 
     })
  }
