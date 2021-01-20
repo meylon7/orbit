@@ -1,110 +1,105 @@
-import React, {useEffect, useState} from "react";
+import React, { useEffect, useState } from "react";
 import { PageHeader, Button } from "antd";
-import sysIPAddress from '../../location'
+import sysIPAddress from "../../location";
 import useSessionstorage from "@rooks/use-sessionstorage";
 import axios from "axios";
-
-
+import '../style/table.css'
 const LOGS = () => {
-const [token] = useSessionstorage('token');
-const [data, setData] = useState([]);
-const [logInfoData, setlogInfoData] = useState([]);
-let logInfo = []
-const [fileName, setfileName] = useState('')
-const [fileSize, setfileSize] = useState('')
-const [lastModified, setlastModified] = useState('')
+  const [token] = useSessionstorage("token");
+  const [data, setData] = useState([]); 
+  const [isOpen, setIsOpen] = useState(false);
+  const [value, setValue] = useState("");
+  
+  function timeConverter(UNIX_timestamp) {
+    let date
+    if ((UNIX_timestamp !== null) && (UNIX_timestamp !== undefined)) {
+      //UNIX_timestamp = 1606129442000;
+      date = new Date(UNIX_timestamp);
+      return date.toUTCString();
+    }
+    else return "Trying to connect to the server..."
 
-useEffect(() => {    
-  getLogInfo();
-}, []);
-
-  const getLogInfo = () => {
-    axios.get("https://" + sysIPAddress + "/api/logging-info", {
+  }
+  const loadData = () => {
+    axios
+    .get("https://" + sysIPAddress + "/api/logging-info", {
       headers: {
         Authorization: "Bearer " + token,
-      }, mode: 'cors'
+      },
+      mode: "cors",
     })
-      .then((res) => {
-        console.log("logging-info data: ",res)
-        data.push(res.data)
-        console.log("data = ",data)
-      })
+    .then((res) => {
+      setData(res.data.LogFilesList);
+      //console.log(data);
+    });
   }
-
-  const renderTableData = () => {
-    return data.map((logFile, index) => {
-          return (
-            <tr key={index}>
-               <td>{logFile.FileName}</td>
-               <td>{logFile.FileSize}</td>
-               <td>{logFile.ModifiedDate}</td>
-               <td>link</td>
-            </tr>
-         )
-
+  useEffect(() => {
+    loadData()
+      return ()=> {
+        
+      }
+  }, []);
+  
+  const downloadFile = (file) => {    
+    setValue(file)
+    console.log(value)
+    axios
+    .get("https://" + sysIPAddress + "/api/files/" + file, {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: "Bearer " + token,
+      },
+      mode: "cors",
     })
- }
-  const downloadLogs = () => {
-
-//     axios
-//           .get(
-//             "https://" + sysIPAddress + "/api/files/messages", 
-//             {
-//               headers: {
-//                 Authorization: "Bearer " + token,
-//               },mode:'cors'
-//             })
-//             .response.blob().then(blob => {
-              
-//               let url = window.URL.createObjectURL(blob);
-//               let a = document.createElement('a');
-//               a.href = url;
-//               a.download = 'employees.json';
-//               a.click();
-//               window.location.href = response.url;
-//             });
-
-
-// data.map((item) => (
-                // <tr key={data.id}>
-                //   <td>{item.FileName}</td>
-                //   <td>{item.FileSize}</td>
-                //   <td>{item.ModifiedDate}</td>
-                //   <td>link</td>
-                //   <td />
-                // </tr>
-              // ))
-// });
-}
-
-
+    .then((blob) => {
+      console.log(blob)
+      // 2. Create blob link to download
+      const url = window.URL.createObjectURL(new Blob([blob]));
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', `sample.${url}`);
+      // 3. Append to html page
+      document.body.appendChild(link);
+      // 4. Force download
+      link.click();
+      // 5. Clean up and remove the link
+      link.parentNode.removeChild(link);
+      
+    })
+    .catch((error) => {
+      console.log(error)
+    });
+  }
   return (
     <>
       <div className="content-wrapper">
         <PageHeader className="site-page-header" title="Logs" />
       </div>
       <div className="content-wrapper">
-        <table className="logInfo-table">
-          <thead>
-            <tr>
-            <th> Name</th>
-            <th> Date modified</th>
-            <th> Size</th>
-            <th> Download</th>
-            </tr>
-            {/* <li className='list-group-item'> <strong>System Control: </strong>{ManualEn}</li> */}
-          </thead>
-          <tbody>
-            
-              {renderTableData()}
-              
-            
-          </tbody>
-        </table>
-        {/* <div className="steps-content">
-            <h1> Download Logs</h1>
-            <Button type="primary" shape="round" onClick={downloadLogs}>Download file</Button>
-        </div> */}
+          
+          <table className="styled-table">
+            <thead>
+              <tr>
+                <th> Name</th>
+                <th> Size</th>
+                <th> Date modified</th>
+                <th> Download</th>
+              </tr>
+            </thead>
+            <tbody>
+              {data.map((value, index) => {
+                return (
+                  <tr key={index}>
+                    <td>{value.FileName}</td>
+                    <td>{value.FileSize}</td>
+                    <td>{timeConverter(value.ModifiedDate)}</td>
+                    <td><a onClick={() => downloadFile(value.FileName)} href="#">Download</a></td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        
       </div>
     </>
   );
