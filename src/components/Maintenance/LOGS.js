@@ -1,110 +1,136 @@
-import React, {useEffect, useState} from "react";
+import React, { useEffect, useState } from "react";
 import { PageHeader, Button } from "antd";
-import sysIPAddress from '../../location'
+import sysIPAddress from "../../location";
 import useSessionstorage from "@rooks/use-sessionstorage";
 import axios from "axios";
-
+import '../style/table.css'
+import fileDownload from 'js-file-download'
+import Progress from "../Progress";
 
 const LOGS = () => {
-const [token] = useSessionstorage('token');
-const [data, setData] = useState([]);
-const [logInfoData, setlogInfoData] = useState([]);
-let logInfo = []
-const [fileName, setfileName] = useState('')
-const [fileSize, setfileSize] = useState('')
-const [lastModified, setlastModified] = useState('')
+  const [token] = useSessionstorage("token");
+  const [data, setData] = useState([]); 
+  const [isOpen, setIsOpen] = useState(false);
+  const [value, setValue] = useState("");
+  const [downloadPercentage, setdownloadPercentage] = useState(0);
+  const [loading, setLoading] = useState(false);
+const [showProgress, setshowProgress] = useState('none')
+const [dlProgress, setdlProgress] = useState([])
 
-useEffect(() => {    
-  getLogInfo();
-}, []);
+  function timeConverter(UNIX_timestamp) {
+    let date
+    if ((UNIX_timestamp !== null) && (UNIX_timestamp !== undefined)) {
+      //UNIX_timestamp = 1606129442000;
+      date = new Date(UNIX_timestamp);
+      return date.toUTCString();
+    }
+    else return "unknown"
 
-  const getLogInfo = () => {
-    axios.get("https://" + sysIPAddress + "/api/logging-info", {
+  }
+  const loadData = () => {
+    axios
+    .get("https://" + sysIPAddress + "/api/logging-info", {
       headers: {
         Authorization: "Bearer " + token,
-      }, mode: 'cors'
+      },
+      mode: "cors",
     })
-      .then((res) => {
-        console.log("logging-info data: ",res)
-        data.push(res.data)
-        console.log("data = ",data)
-      })
+    .then((res) => {
+      setData(res.data.LogFilesList);
+      for (let i = 0; i < res.data.LogFilesList.length; i++) {
+        dlProgress.push(0);
+        
+      }
+      //console.log(data);
+    });
   }
-
-  const renderTableData = () => {
-    return data.map((logFile, index) => {
-          return (
-            <tr key={index}>
-               <td>{logFile.FileName}</td>
-               <td>{logFile.FileSize}</td>
-               <td>{logFile.ModifiedDate}</td>
-               <td>link</td>
-            </tr>
-         )
-
+  useEffect(() => {
+    loadData()
+      return ()=> {
+        
+      }
+  }, []);
+  
+  const downloadFile = (file) => {  
+    setdownloadPercentage(0);
+    setLoading(true);
+    setshowProgress("block")
+    setValue(file)
+    console.log(value)
+    axios
+    .get("https://" + sysIPAddress + "/api/files/" + file, {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: "Bearer " + token,
+      },
+      onDownloadProgress: progressEvent => {
+        const percentage = Math.round(
+          (progressEvent.loaded * 100) / progressEvent.total
+        );
+        setdownloadPercentage(percentage);
+        if (percentage === 100) {
+          setTimeout(() => {
+            setLoading(false);
+          }, 400);
+        }
+      },
+      mode: "cors",
+      responseType: 'blob'
     })
- }
-  const downloadLogs = () => {
-
-//     axios
-//           .get(
-//             "https://" + sysIPAddress + "/api/files/messages", 
-//             {
-//               headers: {
-//                 Authorization: "Bearer " + token,
-//               },mode:'cors'
-//             })
-//             .response.blob().then(blob => {
-              
-//               let url = window.URL.createObjectURL(blob);
-//               let a = document.createElement('a');
-//               a.href = url;
-//               a.download = 'employees.json';
-//               a.click();
-//               window.location.href = response.url;
-//             });
+    .then((res) => {
+      console.log('res:', res)
+      // 2. Create blob link to download
+      // const url = window.URL.createObjectURL(new Blob([blob]));
+      // const link = document.createElement('a');
+      // link.href = url;
+      // link.setAttribute('download', `log.${file}`);
+      // // 3. Append to html page
+      // document.body.appendChild(link);
+      // // 4. Force download
+      // link.click();
+      // // 5. Clean up and remove the link
+      // link.parentNode.removeChild(link);
+      fileDownload(res.data, `${file}.log`)
 
 
-// data.map((item) => (
-                // <tr key={data.id}>
-                //   <td>{item.FileName}</td>
-                //   <td>{item.FileSize}</td>
-                //   <td>{item.ModifiedDate}</td>
-                //   <td>link</td>
-                //   <td />
-                // </tr>
-              // ))
-// });
-}
-
-
+      
+    })
+    .catch((error) => {
+      console.log(error)
+    });
+  }
   return (
     <>
       <div className="content-wrapper">
         <PageHeader className="site-page-header" title="Logs" />
       </div>
       <div className="content-wrapper">
-        <table className="logInfo-table">
-          <thead>
-            <tr>
-            <th> Name</th>
-            <th> Date modified</th>
-            <th> Size</th>
-            <th> Download</th>
-            </tr>
-            {/* <li className='list-group-item'> <strong>System Control: </strong>{ManualEn}</li> */}
-          </thead>
-          <tbody>
-            
-              {renderTableData()}
-              
-            
-          </tbody>
-        </table>
-        {/* <div className="steps-content">
-            <h1> Download Logs</h1>
-            <Button type="primary" shape="round" onClick={downloadLogs}>Download file</Button>
-        </div> */}
+          
+          <table className="styled-table">
+            <thead>
+              <tr>
+                <th> Name</th>
+                <th> Size</th>
+                <th> Date modified</th>
+                <th> </th>
+                <th style={{ display: showProgress}}> Progress</th>
+              </tr>
+            </thead>
+            <tbody>
+              {data.map((value, index) => {
+                return (
+                  <tr key={index}>
+                    <td>{value.FileName}</td>
+                    <td>{parseFloat(value.FileSize / 1000000).toFixed(2)} MB</td>
+                    <td>{timeConverter(value.ModifiedDate)}</td>
+                    <td style={{textDecoration: 'underline'}}><a onClick={() => downloadFile(value.FileName)} href="#">Download</a></td>
+                    {/* <td style={{ display: showProgress}}>{loading && <Progress percentage={downloadPercentage} />}</td> */}
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        
       </div>
     </>
   );
