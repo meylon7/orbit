@@ -11,6 +11,7 @@ import { ProgressBar, Jumbotron, Form } from "react-bootstrap";
 const TD = {
   width: "200px",
 };
+let initialStbyVersion = 'N/A'
 
 const SWUpdate = () => {
   const [activeSW, setActiveSW] = useState(false);
@@ -43,7 +44,8 @@ const SWUpdate = () => {
     //'Content-Type': 'text/plain',
     Authorization: "Bearer " + token,
   };
-  const LoadVersions = () => {
+  function LoadVersions() {
+    console.log("function LoadVersion")
    // setInterval(() => {
       axios
         .get(
@@ -69,11 +71,21 @@ const SWUpdate = () => {
               ? sysversion[0]["SYS.Version"]
               : "N/A";
           let standbyVersion =
-            sysversion[0]["SYS.StbyVersion"] !== null && stbyversion !== "N/A"
+            (sysversion[0]["SYS.StbyVersion"] !== null)
               ? sysversion[0]["SYS.StbyVersion"]
               : "N/A";
+
+              console.log('activeVersion = ', activeVersion)
+              console.log('standbyVersion = ', standbyVersion)
           setVersion(activeVersion);
           setStbyversion(standbyVersion);
+          initialStbyVersion = (sysversion[0]["SYS.StbyVersion"] !== null)
+          ? sysversion[0]["SYS.StbyVersion"]
+          : "N/A";
+          console.log('after setVersion: version = ', version)
+          console.log('after setVersion: version = ', version)
+          console.log('initialStbyVersion = ', initialStbyVersion)
+
           if (standbyVersion !== "N/A") {
             setIfStbyVersionUploaded(true);
           } else {
@@ -131,6 +143,7 @@ const SWUpdate = () => {
       setIfFileSelected(false)
       setIfStbyVersionUploaded(false)
       setMessage("Uploading...")
+      console.log('Start uploading file ', fileToBeUpload)
       let _chunk = fileToBeUpload;
       axios.post("https://" + sysIPAddress + "/api/files/update.tar", _chunk, {
 
@@ -148,32 +161,12 @@ const SWUpdate = () => {
           // Clear percentage
           setTimeout(() => setUploadPercentage(0), 600000);
         }
-      }).then((res) => {
-        console.log("uploadChunk data: ", res.data)
-        setMessage("Updating, please wait. It may take several minutes...")
-        setUploadPercentage(0)
-        const timetotal = 420000 //7 minutes
-        let timeleft = 420000
-        const checkVersion = setInterval(() => {
-          setUploadPercentage(parseInt(100 - Math.floor(timeleft*100/timetotal)))
-          timeleft -= 1000
-          LoadVersions()
-
-          if(stbyversion !== "N/A"){
-            clearInterval(checkVersion)
-            setStbyversion(stbyversion);
-            setMessage("Standby version is installed successfully")
-            setUploadPercentage(100)
-          }else if ((timeleft <= 0) && (stbyversion === "N/A")) {
-            clearInterval(checkVersion)
-            setStbyversion(stbyversion);
-            setMessage("Failed to install standby version")
-            setUploadPercentage(0)
-          }
-        }, 1000);
-
+      })
+      .then((res) => {
+        console.log("uploadChunk data: ", res.data);
+        setMessage("File is uploaded, start writing...");
+        stbyVersionMonitor()
       });
-      
     } catch (error) {
       debugger
       console.log('error', error)
@@ -183,7 +176,7 @@ const SWUpdate = () => {
 
 
   const activateForm = () => {
-    if (window.confirm("After the activation the system will be rebooted automatically. Proceed?")) {
+    if (window.confirm("After the activation the system will be rebooted automatically.\nWould you like to proceed?")) {
 
       const param = {
         MessageName: "HTMLFormUpdate",
@@ -206,6 +199,7 @@ const SWUpdate = () => {
   };
 
   useEffect(() => {
+    console.log('useEffect LoadVersions')
     LoadVersions();
   },[]);
 
@@ -215,6 +209,71 @@ const SWUpdate = () => {
     }
   }, [fileToBeUpload, progress]);
 
+  const stbyVersionMonitor = () => {
+    setMessage("Updating, please wait. This may take a few minutes...")
+    setUploadPercentage(0)
+    const timetotal = 140000 //3 minutes
+    let timeleft = timetotal
+    let standbyVersion
+
+    const checkVersion = setInterval(() => {
+      setUploadPercentage(parseInt(100 - Math.floor(timeleft * 100 / timetotal)))
+      timeleft -= 1000
+      console.log("SetInterval")
+      console.log("timeleft = ", timeleft)
+      console.log('stbyversion = ', stbyversion)
+      axios
+      .get(
+        "https://" +
+        sysIPAddress +
+        "/api/param/get?Parameters=SYS.Version,SYS.StbyVersion",
+        {
+          headers: {
+            "Content-Type": "text/plain",
+            Authorization: "Bearer " + token,
+          },
+          mode: "cors",
+        }
+      )
+      .then((response) => {
+        console.log("get stby version: ", response.data['SYS.StbyVersion']);
+        standbyVersion =
+        (response.data["SYS.StbyVersion"] !== null)? response.data["SYS.StbyVersion"]: "N/A"; 
+      })
+      .catch((error) => {
+        console.error(error);
+      });
+      // console.log('timeleft ', timeleft/1000)
+      if (timeleft > 0) { //first 40 seconds
+        console.log("timeleft = ", timeleft/1000)
+        console.log("standbyVersion: ", standbyVersion);
+        console.log('initialStbyVersion = ', initialStbyVersion)
+      } else  {
+        if (standbyVersion === initialStbyVersion) {
+          clearInterval(checkVersion)
+          setIfStbyVersionUploaded(true);
+          setStbyversion(standbyVersion);
+          setMessage("Warning: Standby version has not been changed.\nPlease choose a different file.")
+          setUploadPercentage(100)
+        }
+        else if ((standbyVersion !== "N/A") && (standbyVersion !== undefined)) {
+          clearInterval(checkVersion)
+          setIfStbyVersionUploaded(true);
+          setStbyversion(standbyVersion);
+          setMessage("Standby version is installed successfully")
+          setUploadPercentage(100)
+          
+        } else if ((timeleft <= 0) && ((standbyVersion === "N/A") || (standbyVersion === undefined))) {
+          clearInterval(checkVersion)
+          setStbyversion(standbyVersion);
+          setMessage("Failed to install standby version")
+          setIfStbyVersionUploaded(false);
+          setUploadPercentage(0)
+        }
+      }
+
+    }, 1000);
+  }
   return (
     <>
       <div className="content-wrapper">
@@ -226,7 +285,7 @@ const SWUpdate = () => {
             <thead></thead>
             <tbody>
               <tr style={{ color: "rgb(3, 79, 132)" }}>
-                <td style={TD}>Active SW Version</td>
+                <td style={TD}>Active Firmware Version:</td>
                 <td>
                   <label>
                     {" "}
@@ -240,23 +299,15 @@ const SWUpdate = () => {
                 <td colSpan="4"></td>
               </tr>
               <tr>
-                <td style={TD}>Standby SW Version</td>
+                <td style={TD}>Standby Firmware Version:</td>
                 <td>
                   <label>
                     {" "}
-                    <strong>{stbyversion}</strong>
+                    {stbyversion}
                   </label>
                 </td>
-                <td style={TD}></td>
-                <td style={TD}>
-                  <Button
-                    shape="round"
-                    onClick={getFileContext}
-                    disabled={!ifFileSelected}
-                  >
-                    Load Version
-                  </Button>
-                </td>
+               
+               
                 <td style={TD}>
                   <Button
                     type="primary"
@@ -271,22 +322,26 @@ const SWUpdate = () => {
               <tr>
                 <td colSpan="2">
                   &nbsp;
-                  <div class="input-group mb-3">
-                    <div class="input-group-prepend">
-                      <span class="input-group-text"></span>
-                    </div>
-                    <div class="custom-file">
-                      <input
-                        type="file"
-                        class="custom-file-input"
+                  <Jumbotron>
+                  <Form>
+                    <Form.Group>
+                      <Form.File
                         id="SelectedFile1"
-                        onChange={selectFile}
+                        onChange={selectFile} 
                       />
-                      <label class="custom-file-label" for="inputGroupFile01">
-                        Choose file
-                      </label>
-                    </div>
-                  </div>
+                    </Form.Group>
+                    
+                  </Form>
+                </Jumbotron>
+                </td>
+                <td style={TD}>
+                  <Button
+                    shape="round"
+                    onClick={getFileContext}
+                    disabled={!ifFileSelected}
+                  >
+                    Load Version
+                  </Button>
                 </td>
                 <td></td>
                 <td></td>
