@@ -140,13 +140,13 @@ svg{
 }
 .info-panel{
 	/* height: 100%; */
-	width: 200px;
+	width: 215px;
 	font-size:12px;
-    margin-top: 10px;
+    margin-top: 1px;
     border-bottom: 1px solid #ddd;
     justify-content: space-between;
 	padding: 10px;
-	margin-left: 20px;
+	margin-left: 2px;
 	text-overflow:ellipsis;
 }
 .list-group-item{
