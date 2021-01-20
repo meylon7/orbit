@@ -164,7 +164,7 @@ export default function CalibrationWizard() {
         
         //message.success("Start step case 0")
 
-        param = { "MessageName": "HTMLFormUpdate", "Parameters": { "MDM.StepTrackEnabled": true, "SYS.ManualEn": false, "BUC.MuteManualEn": false, "BUC.TxEnabled": true, "PNC.YawOffset": 0, "PNC.RllOffset": 0, "PNC.PthOffset": 0, "PNC.AntElOff": 0, "PNC.RF.AzStrkWidth": 0.2, "PNC.RF.ElStrkWidth": 0.2 } }
+        param = { "MessageName": "HTMLFormUpdate", "Parameters": { "MDM.StepTrackEnabled": true, "SYS.ManualEn": false, "BUC.MuteManualEn": false, "BUC.TxEnabled": true, "PNC.YawOffset": 0, "PNC.RllOffset": 0, "PNC.PthOffset": 0, "PNC.AntElOff": 0} }
         axios
           .post("https://" + sysIPAddress + "/api/param/set", param, { headers })
           .then((response) => {
@@ -834,7 +834,7 @@ export default function CalibrationWizard() {
       goToWizardStart(userMessage)
     }
     else {
-      let finalParams = { "MessageName": "HTMLFormUpdate", "Parameters": { "PNC.YawOffset": parseFloat(yaw), "PNC.AntElOff": parseFloat(tempfinalElOffset), "PNC.PthOffset": parseFloat(tempfinalPitchOffset), "PNC.RllOffset": parseFloat(tempfinalRollOffset), "PNC.RF.AzStrkWidth": 0.1, "PNC.RF.ElStrkWidth": 0.1 } }
+      let finalParams = { "MessageName": "HTMLFormUpdate", "Parameters": { "PNC.YawOffset": parseFloat(yaw), "PNC.AntElOff": parseFloat(tempfinalElOffset), "PNC.PthOffset": parseFloat(tempfinalPitchOffset), "PNC.RllOffset": parseFloat(tempfinalRollOffset)} }
        axios
         .post("https://" + sysIPAddress + "/api/param/set", finalParams, {
           headers: {
@@ -919,7 +919,7 @@ export default function CalibrationWizard() {
       console.log(new Date(),"goToWizardStart, yaw = ", yaw)
       console.log(new Date(),"Start step case 0")
 
-      param = { "MessageName": "HTMLFormUpdate", "Parameters": { "PNC.YawOffset": 0, "PNC.RllOffset": 0, "PNC.PthOffset": 0, "PNC.AntElOff": 0, "PNC.RF.AzStrkWidth": 0.1, "PNC.RF.ElStrkWidth": 0.1 } }
+      param = { "MessageName": "HTMLFormUpdate", "Parameters": { "PNC.YawOffset": 0, "PNC.RllOffset": 0, "PNC.PthOffset": 0, "PNC.AntElOff": 0} }
       let response = postAxios(param)
       axios
         .post("https://" + sysIPAddress + "/api/param/set", param, { headers })
