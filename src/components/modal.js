@@ -1,9 +1,10 @@
 import React from "react";
 import ReactDom from "react-dom";
-
+import { Button, Space } from "antd";
 const MODAL_STYLES = {
   position: "fixed",
   minWidth: 800,
+  maxWidth: 800,
   minHeight: 500,
   top: "50%",
   left: "50%",
@@ -27,27 +28,27 @@ const OVERLAY_STYLES = {
   backgroundColor: "rgba(0, 0, 0, .7)",
   zIndex: 1000,
 };
-const BUTTON_STYLES = {
-  padding: "15px 32px",
-  border: "none",
-  textAlign: "center",
-  display: "inline-block",
-  fontSize: "16px",
-  backgroundColor: "#008CBA",
-  color: "white",
-};
+const FOOTER = {
+  position:'absolute',
+  width:'90%',
+    bottom:'0px',
+    textAlign:'right',
+    padding: '15px',
+    marginRight:'30px'
+}
 export default function Modal({ open, children, onClose, onConfirm }) {
   if (!open) return null;
 
   return ReactDom.createPortal(
     <>
-      <div style={OVERLAY_STYLES} />
-      <div style={MODAL_STYLES}>
-        
-        <div>{children}</div>
-        <button style={BUTTON_STYLES} onClick={onClose}>Cancel</button>
-        <button style={BUTTON_STYLES} onClick={onConfirm}>Confirm</button>
+    <div style={OVERLAY_STYLES} />
+    <div style={MODAL_STYLES}>
+      
+      {children}
+      <div style={FOOTER}>
+      <Space><Button shape="round" type="primary" onClick={onClose}>Close</Button><Button shape="round" type="primary" onClick={onConfirm}>Confirm</Button></Space>
       </div>
+    </div>
     </>,
     document.getElementById("portal")
   );

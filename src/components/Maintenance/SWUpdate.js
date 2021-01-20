@@ -239,56 +239,11 @@ const SWUpdate = () => {
     }
   };
 
-  const uploadCompleted = async () => {
-    var formData = new FormData();
-    formData.append("update.tar", fileGuid);
-    const response = await axios
-      .get(
-        "https://" + sysIPAddress + "/api/param/get?Parameters=SYS.StbyVersion",
-        {
-          headers: {
-            "Content-Type": "text/plain",
-            Authorization: "Bearer " + token,
-          },
-          mode: "cors",
-        }
-      )
-      .catch((err) => {
-        if (err.response.status === 500) {
-          setMessage("There was a problem with the server");
-        } else {
-          setMessage(err.response.data.msg);
-        }
-      });
-
-    const data = response.data;
-    if (data["SYS.StbyVersion"] !== null) {
-      setProgress(100);
-      setMessage("File Uploaded");
-    }
-  };
 
   const TD = {
     width: "200px",
   };
-  const submitForm = () => {
-    const formData = new FormData();
-    formData.append("name", name);
-    formData.append("file", selectedFile);
 
-    axios
-      .post("https://" + sysIPAddress + "/api/files/update.tar", formData, {
-        headers: {
-          "content-type": "multipart/form-data",
-          Authorization: "Bearer " + token,
-        },
-      })
-      .then((res) => {
-        LoadVersions();
-        message.success("File Upload success");
-      })
-      .catch((err) => alert("File Upload Error"));
-  };
 
   const activateForm = () => {
     if (
