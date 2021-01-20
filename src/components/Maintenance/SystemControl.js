@@ -16,12 +16,9 @@ import {
   Switch,
 } from "antd";
 import axios from "axios";
-import { SocketContext } from "../../App";
 const SystemControl = () => {
   //////////////////////////////////////
   const [token] = useSessionstorage("token");
-  //const data = useContext(SocketContext);
-  //const [infoData, setInfoData] = useState([]);
   let acuAutomatic = true
   let bucAutomatic = true
   const [automatic, setAutomatic] = useState(true);
@@ -380,7 +377,6 @@ const SystemControl = () => {
       });
   };
 
-
   const postTxBand = () => {
     const param = {
       MessageName: "HTMLFormUpdate",
@@ -422,7 +418,12 @@ const SystemControl = () => {
     fontWeight: '600',
     fontSize: '14px'
   };
-
+  const LABEL_BIG = {
+    fontWeight: "bold",
+    color: "#034f84",
+    fontWeight: '600',
+    fontSize: '22px'
+  };
   const setCurrentStep = (e) => {
     setCurrentStepVal(e);
     setStep(e);
@@ -584,7 +585,7 @@ const SystemControl = () => {
         <PageHeader className="site-page-header" title="System Control" />
       </div>
       <div className="content-wrapper">
-        <div style={LABEL}>ACU</div>
+        <div style={LABEL_BIG}>ACU</div>
         <Accordion key={acuAutomatic} easing="ease" onChange={(e) => changeSysAutoManual(e.activeItems[0])}>
           <AccordionItem title="Automatic" expanded={automatic}>
             <Row width="100%">
@@ -834,8 +835,8 @@ const SystemControl = () => {
             </Row>
           </AccordionItem>
         </Accordion>
-        <div style={LABEL}>BUC MUTE</div>
-        <Accordion accordion onChange={(e) => changeBucAutoManual(e.activeItems[0])}>
+        <div style={LABEL_BIG}>BUC MUTE</div>
+        <Accordion accordion key={bucAutomatic}  easing="ease" onChange={(e) => changeBucAutoManual(e.activeItems[0])}>
           <AccordionItem title="Automatic" expanded={automaticBUC}>
             {/* On “Manual” radio button selection:
               User is alerted with message:
