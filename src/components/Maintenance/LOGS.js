@@ -124,7 +124,7 @@ const [dlProgress, setdlProgress] = useState([])
                     <td>{parseFloat(value.FileSize / 1000000).toFixed(2)} MB</td>
                     <td>{timeConverter(value.ModifiedDate)}</td>
                     <td style={{textDecoration: 'underline'}}><a onClick={() => downloadFile(value.FileName)} href="#">Download</a></td>
-                    {/* <td style={{ display: showProgress}}>{loading && <Progress percentage={downloadPercentage} />}</td> */}
+                    <td style={{ display: showProgress}}>{loading && <Progress percentage={downloadPercentage} />}</td>
                   </tr>
                 );
               })}
