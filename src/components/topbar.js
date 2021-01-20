@@ -289,7 +289,7 @@ const Topbar = () => {
                
             </div>
             <div className="right">
-            <span className="timer">{timeConverter(infoData["ARM.UTCTime"])} &nbsp;&nbsp;</span>
+            <span className="timer">{timeConverter(infoData["ARM.UTCTime"])}&nbsp;&nbsp;</span>
             { showDisconnected ? <span>
               
             <Tooltip title="Trying to connect to the server..." trigger="hover">
