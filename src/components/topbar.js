@@ -21,6 +21,8 @@ const Topbar = () => {
     const [token, setToken, removeToken] = useSessionstorage('token');
     const [user, setUser, removeUser] = useSessionstorage('user');
     const [unsaved, setUnsaved, removeUnsaved] = useSessionstorage('unsavedConfigChanges');
+    const [buttonColor, setButtonColor] = useState('black');
+    const [color, setColor] = useSessionstorage('color');
     const [infoData, setInfoData] = useState([]);
     const [showDisconnected, setShowDisconnected] = useState(false);
     
@@ -31,13 +33,10 @@ const Topbar = () => {
     }, [data],showDisconnected);
     
   useEffect(() => {
-    if (unsaved) {
-      saveButtonColor = 'red'
-    }
-    else {
-      saveButtonColor = 'black'
-    }
+    const tmp = (window.sessionStorage.color).slice(1,-1)
+    setButtonColor(tmp)
   });
+
 
   function timeConverter(UNIX_timestamp) {
     let date
@@ -57,7 +56,9 @@ const Topbar = () => {
         const param = {
           MessageName: "HTMLFormUpdate",
           Parameters: {
-            "PNC.SaveToFlash": true
+            "PNC.SaveToFlash": true,
+            "ARM.SaveToFlash": true,
+            // "SDU.SaveToFlash": true
           },
         };
         axios
@@ -67,16 +68,19 @@ const Topbar = () => {
           .then((response) => {
             console.log("Post", response.data.Parameters);
             setUnsaved(false)
+            setColor('black')
             //message.success('Saved to memory')
           })
           .catch((error) => {
+            const tmp = (window.sessionStorage.color).slice(1,-1)
+            setButtonColor(tmp)
             console.error(error);
           });
       };
     
   const resetAcuBuc = () => {
     if (window.confirm("You are about to reset Antenna. Are you sure?")) {
-      if(unsaved){
+      if(((window.sessionStorage.color).slice(1,-1)).contains('red')){
         if(window.confirm("Save changes to memory?\nOtherwise they will be lost after the reboot")){
           saveToMemory()
         }
@@ -298,7 +302,7 @@ const Topbar = () => {
 
             </span> : null } 
             <Tooltip title="Save to memory" trigger="hover" >
-                    <Button onClick={saveToMemory}> <SaveTwoTone  twoToneColor={saveButtonColor}/></Button>
+                    <Button onClick={saveToMemory}> <SaveTwoTone  twoToneColor={buttonColor}/></Button>
             </Tooltip>
 
             <Tooltip title="Reset Antenna" trigger="hover">
