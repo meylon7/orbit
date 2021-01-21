@@ -79,17 +79,7 @@ const [dlProgress, setdlProgress] = useState([])
     })
     .then((res) => {
       console.log('res:', res)
-      // 2. Create blob link to download
-      // const url = window.URL.createObjectURL(new Blob([blob]));
-      // const link = document.createElement('a');
-      // link.href = url;
-      // link.setAttribute('download', `log.${file}`);
-      // // 3. Append to html page
-      // document.body.appendChild(link);
-      // // 4. Force download
-      // link.click();
-      // // 5. Clean up and remove the link
-      // link.parentNode.removeChild(link);
+      
       fileDownload(res.data, `${file}.log`)
 
 
@@ -113,7 +103,6 @@ const [dlProgress, setdlProgress] = useState([])
                 <th> Size</th>
                 <th> Date modified</th>
                 <th> </th>
-                <th style={{ display: showProgress}}> Progress</th>
               </tr>
             </thead>
             <tbody>
@@ -124,13 +113,14 @@ const [dlProgress, setdlProgress] = useState([])
                     <td>{parseFloat(value.FileSize / 1000000).toFixed(2)} MB</td>
                     <td>{timeConverter(value.ModifiedDate)}</td>
                     <td style={{textDecoration: 'underline'}}><a onClick={() => downloadFile(value.FileName)} href="#">Download</a></td>
-                    <td style={{ display: showProgress}}>{loading && <Progress percentage={downloadPercentage} />}</td>
                   </tr>
                 );
               })}
             </tbody>
           </table>
-        
+        <div>
+          <p style={{ display: showProgress}}>{loading && <Progress percentage={downloadPercentage} />}</p>
+        </div>
       </div>
     </>
   );
