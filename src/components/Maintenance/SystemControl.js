@@ -49,6 +49,8 @@ const SystemControl = () => {
   const [automaticBUC, setAutomaticBUC] = useState(true);
   const [manualBUC, setmanualBUC] = useState(false);
   const [bucTxEnabled, setBucTxEnabled] = useState(false);
+  const [unsaved, setUnsaved] = useSessionstorage('unsavedConfigChanges');
+  const [topButtonColor, setTopButtonColor] = useSessionstorage('color')
   const { Option } = Select;
   const selectmode = useRef('')
   var syscontroldata = []
@@ -309,6 +311,8 @@ const SystemControl = () => {
           .then((response) => {
             console.log("Post", response.data.Parameters);
             message.success('success')
+            setUnsaved(true)
+            setTopButtonColor('red')
           })
           .catch((error) => {
             console.error(error);
@@ -333,6 +337,8 @@ const SystemControl = () => {
           .post("https://" + sysIPAddress + "/api/param/set", param, { headers })
           .then((response) => {
             console.log("Post", response.data.Parameters);
+            setUnsaved(true)
+            setTopButtonColor('red')
             message.success('success')
           })
           .catch((error) => {
@@ -353,6 +359,7 @@ const SystemControl = () => {
           .post("https://" + sysIPAddress + "/api/param/set", param, { headers })
           .then((response) => {
             console.log("Post", response.data.Parameters);
+            setUnsaved(true)
             message.success('success')
           })
           .catch((error) => {
@@ -374,6 +381,9 @@ const SystemControl = () => {
       .then((response) => {
         console.log("Post", response.data.Parameters);
         getBandOk(response.data.Parameters);
+        setUnsaved(true)
+        setTopButtonColor('red')
+
       })
       .catch((error) => {
         console.error(error);
@@ -394,6 +404,9 @@ const SystemControl = () => {
       .then((response) => {
         console.log("Post", response.data.Parameters);
         getBandOk(response.data.Parameters);
+        setUnsaved(true)
+        setTopButtonColor('red')
+
       })
       .catch((error) => {
         console.error(error);
@@ -410,6 +423,9 @@ const SystemControl = () => {
         message.success('success')
         setTxBandFromLo(res.data[0]["BUC.TxLo"])
         setRxBandFromLo(res.data[0]["LNB.RxLo"])
+        setUnsaved(true)
+        setTopButtonColor('red')
+
       })
       .catch((error) => {
         console.error(error);
@@ -455,6 +471,9 @@ const SystemControl = () => {
       .post("https://" + sysIPAddress + "/api/param/set", param, { headers })
       .then((response) => {
         console.log("Post", response.data.Parameters);
+        setUnsaved(true)
+        setTopButtonColor('red')
+
         getManualMute(response.data.Parameters);
       })
       .catch((error) => {
@@ -500,16 +519,22 @@ const SystemControl = () => {
             console.log("Post", response.data.Parameters);
             setAutomaticBUC(false);
             setmanualBUC(true);
+            setUnsaved(true)
+            setTopButtonColor('red')
+
 
           })
           .catch((error) => {
             console.error(error);
             setAutomaticBUC(true);
+
           });
 
       } else {
         setAutomaticBUC(true);
         setmanualBUC(false);
+        setUnsaved(true)
+        setTopButtonColor('red')
         key = 0
       }
 
@@ -525,6 +550,9 @@ const SystemControl = () => {
         .then((response) => {
           console.log("Post", response.data.Parameters);
           setAutomaticBUC(false)
+          setUnsaved(true)
+          setTopButtonColor('red')
+
         })
         .catch((error) => {
           console.error(error);
@@ -549,6 +577,8 @@ const SystemControl = () => {
             console.log("Post", response.data.Parameters);
             setAutomatic(false);
             setManual(true);
+            setTopButtonColor('red')
+
           })
           .catch((error) => {
             console.error(error);
@@ -571,6 +601,8 @@ const SystemControl = () => {
         .then((response) => {
           console.log("Post", response.data.Parameters);
           getBandOk(response.data.Parameters);
+          setTopButtonColor('red')
+
         })
         .catch((error) => {
           console.error(error);
@@ -592,35 +624,32 @@ const SystemControl = () => {
                 <span style={LABEL}>Mode:</span>
               </Col>
               <Col span={4}>
-                <Select defaultValue="Open AMIP" style={{ width: 200 }}>
-                  <Option value="openamip">Open AMIP</Option>
-                </Select>{" "}
+              <span>OpenAMIP</span>
               </Col>
+            </Row>
+            <div className="divider-line">&nbsp;</div>
+            <div className="divider-line">&nbsp;</div>
+            
+              <Row>
               <Col span={4} >
+              <Switch
+                size="large"
+                checkedChildren="Step Track On"
+                unCheckedChildren="Step Track Off"
+                checked={stepTrack}
+                onChange={() => setStepTrack(!stepTrack)}
+              />{" "}
+              </Col>
+              <Col span={8} >
                 <Button shape="round" onClick={postStepTrack} type="primary">
                   Apply
               </Button>
               </Col>
-            </Row>
-            <Divider orientation="left" style={{ 'background-color': '#ffffff' }}/>
-
-            <Col span={4}>
-            </Col>
-            <Col span={16} >
-              <Switch
-                size="large"
-                checkedChildren="On"
-                unCheckedChildren="Off"
-                checked={stepTrack}
-                onChange={() => setStepTrack(!stepTrack)}
-              />{" "}
-              Step Track
-              </Col>
+              </Row>
+             
           </AccordionItem>
           <AccordionItem title="Manual" expanded={manual}>
-            <Divider orientation="left" style={LABEL}>
-              Mode
-            </Divider>
+            <Divider orientation="left" style={LABEL}> Mode </Divider>
             <Row width="100%">
               <Col span={4} style={LABEL}>
                 Mode:
@@ -669,22 +698,24 @@ const SystemControl = () => {
                 </span>
               </Col>
             </Row>
-            <div className="divider-line">&nbsp;</div>
+            <div className="divider-line"style={{ display: showAzimuth }}>&nbsp;</div>
+
             <Row width="100%">
               <Col span={24}>
                 {/* azimuth area */}
+
                 <Row>
                   <Col span={4} style={{ display: showAzimuth }}>
                     <span style={LABEL}>Azimuth:</span>
                   </Col>
-                  <Col span={9} style={{ display: showAzimuth }}>
-                    <InputNumber value={azimuth} id="azimuthid" onChange={(e) => setAzimuth(e)} min={0} max={360} step={step} />
+                  <Col span={6} style={{ display: showAzimuth }}>
+                    <InputNumber value={azimuth} id="azimuthid" onChange={(e) => setAzimuth(e)} min={0} max={360} step={step} /> [deg]
                   </Col>
-                  <Col span={2} style={{ display: showAzimuth }}>
-                    <span style={LABEL}><ToolOutlined />Step size:</span>
+                  <Col span={4} style={{ display: showAzimuth }}>
+                    <span ><ToolOutlined />Step size:</span>
                   </Col>
 
-                  <Col span={2} style={{ display: showAzimuth }}>
+                  <Col span={6} style={{ display: showAzimuth }}>
                     <InputNumber
                       id="difinestep"
                       defaultValue={0.1}
@@ -693,7 +724,7 @@ const SystemControl = () => {
                       min={0.1}
                       max={10}
                       step={0.1}
-                    />{" "}
+                    />{" "} [deg]
                   </Col>
                   
                 </Row>
@@ -709,15 +740,15 @@ const SystemControl = () => {
                       max={90}
                       step={step}
                       onChange={(e) => setElevation(e)}
-                    />
+                    /> [deg]
                   </Col>
                 </Row>
-                {/* lang lat area  */}
+                <div className="divider-line" style={{ display: showLongLat}}>&nbsp;</div>
                 <Row>
                   <Col span={4} style={{ display: showLongLat }}>
                     <span style={LABEL}>Longitude:</span>
                   </Col>
-                  <Col style={{ display: showLongLat }} span={9}>
+                  <Col style={{ display: showLongLat }} span={6}>
                     <InputNumber
                       id="longitudeid" value={longitude}
                       min={0}
@@ -726,10 +757,11 @@ const SystemControl = () => {
                       onChange={(e) => setLongitude(e)}
                     /> [deg]
                   </Col>
-                  <Col span={2} style={{ display: showLongLat }}>
-                    <span style={LABEL}>Step size:</span>
+
+                  <Col span={4} style={{ display: showLongLat }}>
+                    <span ><ToolOutlined />Step size:</span>
                   </Col>
-                  <Col span={2} style={{ display: showLongLat }}>
+                  <Col span={6} style={{ display: showLongLat }}>
                     <InputNumber
                       id="difinestep"
                       defaultValue={0.1}
@@ -738,13 +770,11 @@ const SystemControl = () => {
                       min={0.1}
                       max={10}
                       step={0.1}
-                    />{" "}
+                    />{" "}[deg]
                   </Col>
-                  <Col span={2} style={{ display: showLongLat }}>
-                    
-                  </Col>
+
                 </Row>
-                <div className="divider-line" style={{ display: showPolarization}}>&nbsp;</div>
+                <div className="divider-line" style={{ display: showLongLat}}>&nbsp;</div>
                 <Row >
                   <Col span={4} style={{ display: showLongLat }}>
                     <span style={LABEL}>Latitude:</span>
@@ -753,16 +783,20 @@ const SystemControl = () => {
                     <InputNumber id="latitudeid" onChange={(e) => setLatitude(e)} value={latitude} min={0} max={90} step={step} /> [deg]
                   </Col>
                 </Row>
-                <div className="divider-line" style={{ display: showPolarization}}>&nbsp;</div>
+                <div className="divider-line" style={{ display: showLongLat}}>&nbsp;</div>
                 <Row>
                   <Col span={4} style={{ display: showLongLat }}>
                     <span style={LABEL}>Altitude:</span>
                   </Col>
+
                   <Col span={17} style={{ display: showLongLat }}>
                     <InputNumber id="altitudeid" onChange={(e) => setAltitude(e)} value={altitude} min={0} max={100000000} step={step} /> [m]
                   </Col>
                 </Row>
-                <div className="divider-line" style={{ display: showPolarization}}>&nbsp;</div>
+                <div className="divider-line" style={{ display: showLongLat}}>&nbsp;</div>
+
+                <div className="divider-line"style={{ display: showAzimuth }}>&nbsp;</div>
+                <div className="divider-line"style={{ display: showPolarization }}>&nbsp;</div>
                 <Row style={{ display: showPolarization, width: '100%' }}>
                   <Col span={24}>
                     <Row>
@@ -793,12 +827,15 @@ const SystemControl = () => {
                 </Row>
               </Col>
             </Row>
+            <div className="divider-line" style={{ display: showAzimuth}}>&nbsp;</div>
+            <div className="divider-line" style={{ display: showLongLat}}>&nbsp;</div>
+
             <Divider orientation="left"  style={LABEL}>Band </Divider>
             <Row>
               <Col span={4} style={LABEL}>
                 Tx Band:
               </Col>
-              <Col span={4}>
+              <Col span={6}>
                 <Select style={{ width: 90 }} onChange={TxBandUpdate} value = {txBand}>
                   <Option value="29-30" selected>29-30</Option>{" "}
                   {/* mode: point slide 13 */}
@@ -809,7 +846,7 @@ const SystemControl = () => {
               <Col span={2} style={LABEL}>
                 Tx LO:
               </Col>
-              <Col span={4}>{txLO} [GHz]</Col>
+              <Col span={8}>{txLO} [GHz]</Col>
               <Col span={4}>
                 <Button shape="round" type="primary" onClick={postTxBand}>
                   Apply
@@ -825,11 +862,11 @@ const SystemControl = () => {
               <Col span={4} style={LABEL}>
                 Rx Band:
               </Col>
-              <Col span={4}>{rxBand}[GHz]</Col>
+              <Col span={6}>{rxBand}&nbsp;&nbsp;&nbsp;&nbsp;[GHz]</Col>
               <Col span={2} style={LABEL}>
                 Rx LO:
               </Col>
-              <Col span={4}>{rxLO} [GHz]</Col>
+              <Col span={8}>{rxLO} [GHz]</Col>
               <Col span={4}></Col>
             </Row>
           </AccordionItem>
@@ -837,16 +874,6 @@ const SystemControl = () => {
         <div style={LABEL}>BUC MUTE</div>
         <Accordion accordion onChange={(e) => changeBucAutoManual(e.activeItems[0])}>
           <AccordionItem title="Automatic" expanded={automaticBUC}>
-            {/* On “Manual” radio button selection:
-              User is alerted with message:
-              “Attention: BUC will be controlled manually by operator. Are you sure?”
-              If the user chooses “Yes”, the “Manual” option turned on
-              -	POST API is called as follows:
-              {"MessageName": "HTMLFormUpdate","Parameters": {" BUC.MuteManualEn": true }}
-              BUC.TxEnabled = true : Unmute
-              BUC.TxEnabled = false : Mute
-
-              */}
           </AccordionItem>
           <AccordionItem title="Manual" key="2" expanded={manualBUC}>
             {" "}

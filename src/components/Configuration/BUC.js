@@ -21,9 +21,17 @@ import { createGlobalStyle } from "styled-components";
 
 
 const BUC = () => {
+  const LABEL = {
+    fontWeight: "bold",
+    color: "#034f84",
+    fontWeight: '600',
+    fontSize: '16px'
+  };
+
  const [token, setToken, removeToken] = useSessionstorage('token');
-  const [unsaved, setUnsaved, removeUnsaved] = useSessionstorage('unsavedConfigChanges');
-  const { Panel } = Collapse;
+ const [unsaved, setUnsaved] = useSessionstorage('unsavedConfigChanges');
+ const [topButtonColor, setTopButtonColor] = useSessionstorage('color')
+ const { Panel } = Collapse;
   const [minElevation, setMinElevation] = useState();
   const [minElevationEn, setMinElevationEn] = useState();
   
@@ -178,9 +186,10 @@ const BUC = () => {
       .then((response) => {
         console.log("Post", response.data.Parameters);
        // getConditionalMuteOk(response.data.Parameters);
+       setUnsaved(true);
+       setTopButtonColor('red')
         fetchData()
         console.log(unsaved)
-        setUnsaved(true);
         console.log(unsaved)
       })
       .catch((error) => {
@@ -232,8 +241,10 @@ const BUC = () => {
       },mode:'cors' })
       .then((response) => {
         console.log("Post", response.data.Parameters);
+        setUnsaved(true)
+        setTopButtonColor('red')
+
         fetchData();
-       setUnsaved(true)
 
       })
       .catch((error) => {
@@ -273,6 +284,8 @@ const BUC = () => {
         <PageHeader className="site-page-header" title="Conditional Mute" />
       </div>
       <div className="content-wrapper">
+      <Divider orientation="left" style={LABEL}> General definitions </Divider>
+      <div className="divider-line">&nbsp;</div>
         <Row>
           <Col span={8}>
             <Space>
@@ -283,7 +296,7 @@ const BUC = () => {
                 checked={minElevationEn}
                 onChange={() => setMinElevationEn(!minElevationEn)}
               />{" "}
-              Min Elevation [deg]
+              Minimum Elevation
             </Space>
           </Col>
           <Col span={8}>
@@ -296,7 +309,7 @@ const BUC = () => {
                 step={0.1}
                 onChange={(e) => setMinElevation(e)}
                 value={minElevation}
-              />
+              /> [deg]
             </Space>
           </Col>
 
@@ -308,8 +321,11 @@ const BUC = () => {
             </Space>
           </Col>
         </Row>
-       
-        <Divider />
+        <div className="divider-line">&nbsp;</div>
+
+        <Divider orientation="left" style={LABEL}> Blockage Zones definition </Divider>
+        <div className="divider-line">&nbsp;</div>
+
         <Row id="bz1 and bz2">
           <Col span={2}>
               <Switch
@@ -319,11 +335,11 @@ const BUC = () => {
                 onChange={() => setBZ1(!bz1En)}
               />{" "}
           </Col>
-          <Col span={6}>
-              <Collapse accordion>
+          <Col span={9}>
+              <Collapse accordion >
                 <Panel header="Block Zone 1" key="1">
                   <Row>
-                    <Col span={1}> Az </Col>
+                    <Col span={2}> Az<sub>1</sub> </Col>
                     <Col span={8}>
                       <Space>
                         {" "}
@@ -337,6 +353,9 @@ const BUC = () => {
                         ></InputNumber>
                       </Space>
                     </Col>
+                    <Col span={2}></Col>
+                    <Col span={2}> Az<sub>2</sub> </Col>
+
                     <Col span={8}>
                       <Space>
                         {" "}
@@ -352,8 +371,11 @@ const BUC = () => {
                       </Space>
                     </Col>
                   </Row>
+                  <div className="divider-line">&nbsp;</div>
+
                   <Row>
-                    <Col span={1}> El   </Col>
+
+                    <Col span={2}> El<sub>1</sub></Col>
                     <Col span={8}>
                       <Space>
                         {" "}
@@ -367,6 +389,8 @@ const BUC = () => {
                         ></InputNumber>
                       </Space>
                     </Col>
+                    <Col span={2}></Col>
+                    <Col span={2}> El<sub>2</sub> </Col>
                     <Col span={8}>
                       <Space>
                         {" "}
@@ -385,7 +409,7 @@ const BUC = () => {
                 </Panel>
               </Collapse>
           </Col>
-          <Col span={2}></Col>
+          <Col span={1}></Col>
           <Col span={2}>
             <Space>
               <Switch
@@ -397,11 +421,11 @@ const BUC = () => {
               />
             </Space>
           </Col>
-          <Col span={6}>
+          <Col span={9}>
             <Collapse accordion>
               <Panel header="Block Zone 2" key="1">
                   <Row>
-                    <Col span={1}> Az </Col>
+                  <Col span={2}> Az<sub>1</sub> </Col>
                     <Col span={8}>
                       <Space>
                         {" "}
@@ -415,6 +439,9 @@ const BUC = () => {
                         ></InputNumber>
                       </Space>
                     </Col>
+                    <Col span={2}></Col>
+                    <Col span={2}> Az<sub>2</sub> </Col>
+
                     <Col span={8}>
                       <Space>
                         {" "}
@@ -429,8 +456,10 @@ const BUC = () => {
                       </Space>
                     </Col>
                   </Row>
+                  <div className="divider-line">&nbsp;</div>
+
                   <Row>
-                    <Col span={1}> El  </Col>
+                  <Col span={2}> El<sub>1</sub> </Col>
                     <Col span={8}>
                       <Space>
                         {" "}
@@ -444,6 +473,9 @@ const BUC = () => {
                         ></InputNumber>
                       </Space>
                     </Col>
+                    <Col span={2}></Col>
+                    <Col span={2}> El<sub>2</sub> </Col>
+
                     <Col span={8}>
                       <Space>
                         {" "}
@@ -462,9 +494,10 @@ const BUC = () => {
               </Collapse>
           </Col>
         </Row>
-        <Row>
-          <Col span={24}></Col>
-        </Row>
+        <div className="divider-line">&nbsp;</div>
+
+        <div className="divider-line">&nbsp;</div>
+
         <Row id="bz3 and bz4">
           <Col span={2}>
               <Switch
@@ -475,11 +508,11 @@ const BUC = () => {
                 onChange={() => setBZ3(!bz3En)}
               />
           </Col>
-          <Col span={6}>
+          <Col span={9}>
             <Collapse accordion>
             <Panel header="Block Zone 3" key="1">
                   <Row>
-                    <Col span={1}> Az  </Col>
+                  <Col span={2}> Az<sub>1</sub> </Col>
                     <Col span={8}>
                       <Space>
                         {" "}
@@ -493,6 +526,9 @@ const BUC = () => {
                         ></InputNumber>
                       </Space>
                     </Col>
+                    <Col span={2}></Col>
+                    <Col span={2}> Az<sub>2</sub> </Col>
+
                     <Col span={8}>
                       <Space>
                         {" "}
@@ -507,8 +543,10 @@ const BUC = () => {
                       </Space>
                     </Col>
                   </Row>
+                  <div className="divider-line">&nbsp;</div>
+
                   <Row>
-                    <Col span={1}> El </Col>
+                    <Col span={2}> El<sub>1</sub> </Col>
                     <Col span={8}>
                       <Space>
                         {" "}
@@ -522,6 +560,9 @@ const BUC = () => {
                         ></InputNumber>
                       </Space>
                     </Col>
+                    <Col span={2}></Col>
+                    <Col span={2}> El<sub>2</sub> </Col>
+
                     <Col span={8}>
                       <Space>
                         {" "}
@@ -539,7 +580,7 @@ const BUC = () => {
                 </Panel>
               </Collapse>
           </Col>
-          <Col span={2}></Col>
+          <Col span={1}></Col>
           <Col span={2}>
             <Space>
               <Switch
@@ -551,11 +592,11 @@ const BUC = () => {
               />
             </Space>
           </Col>
-          <Col span={6}>
+          <Col span={9}>
             <Collapse accordion>
             <Panel header="Block Zone 4" key="1">
                   <Row>
-                    <Col span={1}> Az     </Col>
+                  <Col span={2}> Az<sub>1</sub> </Col>
                     <Col span={8}>
                       <Space>
                         {" "}
@@ -569,6 +610,9 @@ const BUC = () => {
                         ></InputNumber>
                       </Space>
                     </Col>
+                    <Col span={2}></Col>
+                    <Col span={2}> Az<sub>2</sub> </Col>
+
                     <Col span={8}>
                       <Space>
                         {" "}
@@ -583,8 +627,10 @@ const BUC = () => {
                       </Space>
                     </Col>
                   </Row>
+                  <div className="divider-line">&nbsp;</div>
+
                   <Row>
-                    <Col span={1}> El </Col>
+                  <Col span={2}> El<sub>1</sub> </Col>
                     <Col span={8}>
                       <Space>
                         {" "}
@@ -598,6 +644,8 @@ const BUC = () => {
                         ></InputNumber>
                       </Space>
                     </Col>
+                    <Col span={2}></Col>
+                    <Col span={2}> El<sub>2</sub> </Col>
                     <Col span={8}>
                       <Space>
                         {" "}

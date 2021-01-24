@@ -6,6 +6,7 @@ import sysIPAddress from '../../location'
 const Connectivity = () => {
    const [token, setToken, removeToken] = useSessionstorage('token');
   const [unsaved, setUnsaved, removeUnsaved] = useSessionstorage('unsavedConfigChanges');
+  const [topButtonColor, setTopButtonColor] = useSessionstorage('color')
   const [antennaIP, setAntennaIP] = useState();
   const [antennaSubnet, setAntennaSubnet] = useState();
   const [antennaGateway, setAntennaGateway] = useState();
@@ -89,6 +90,8 @@ const Connectivity = () => {
        console.log(res)
        message.success('success')
        setUnsaved(true)
+       setTopButtonColor('red')
+
      }).catch((error) => {
        console.error(error);
      });
@@ -110,6 +113,9 @@ const mptLinkFetch = () => {
      .then((res) => {
        console.log(res)
        message.success('success')
+       setUnsaved(true)
+       setTopButtonColor('red')
+
      }).catch((error) => {
        console.error(error);
      });
@@ -144,6 +150,8 @@ const mptLinkFetch = () => {
        console.log(res)
        message.success('success')
        setUnsaved(true)
+       setTopButtonColor('red')
+
      }).catch((error) => {
        console.error(error);
        message.success('Failed to update MPT-Link settings')

@@ -33,6 +33,7 @@ const App = () => {
   const [socketInfo, setSocketInfo] = useState([]);
   const [unsaved, setUnsaved, removeUnsaved] = useSessionstorage('unsavedConfigChanges');
   const [satLockState, setSatLockState, removeLockState] = useSessionstorage('SatLockState');
+  const [color, setColor] = useSessionstorage('color');
   const history = useHistory();
   
   let ws;
@@ -114,8 +115,9 @@ const App = () => {
     
     connect()
   
-    setUnsaved(false)
     setSatLockState(false)
+    setUnsaved(false)
+    setColor('black')
     return () => {
       ws.close();
       
