@@ -13,6 +13,7 @@ const InfoPanel = () => {
   let nextYawCounter = 0
   let AntennaOKColor = 'black'
   let BUCIsOKColor = 'black'
+  let BUCAutomaticColor = 'black'
   let BUCLockedColor = 'black'
   let SystemLockedColor = 'black'
 
@@ -54,6 +55,8 @@ const InfoPanel = () => {
 
     if (infoData["BUC.MuteManualEn"] === undefined || infoData["BUC.MuteManualEn"] === null) MuteManualEn = 'N/A'
     else (MuteManualEn = infoData["BUC.MuteManualEn"] === false ? 'Auto' : 'Manual')
+    if(MuteManualEn === 'Manual') BUCAutomaticColor = 'red'
+    else BUCAutomaticColor = 'black'
 
     if (infoData["BUC.Locked"] === undefined || infoData["BUC.Locked"] === null) Locked = 'N/A'
     else (Locked = infoData["BUC.Locked"] === false ? 'Failed' : 'OK')
@@ -193,7 +196,7 @@ const InfoPanel = () => {
         <li className='list-group-item'> <strong>Satellite Lon: </strong>{Lon} [deg]</li>
         <li className='list-group-item'> <strong>TX Polarization: </strong>{TxPol}</li>
         <li className='list-group-item'> <strong>Tx LO: </strong>{TxLo} [GHz]</li>
-        <li className='list-group-item' style={{ color: "black" }}>  <strong>BUC Control: </strong>{MuteManualEn}</li>
+        <li className='list-group-item' style={{ color: BUCAutomaticColor }}>  <strong>BUC Control: </strong>{MuteManualEn}</li>
         <li className='list-group-item' style={{color: BUCIsOKColor}} > <strong>BUC Status: </strong>{bucStatus}</li>
         <li className='list-group-item' style={{color: BUCLockedColor}}> <strong>BUC Locked:  </strong>{Locked}</li> {/*  BUC.Locked  = false -->  Unlocked, BUC.Locked  = true -->  Locked*/}
         <li className='list-group-item' style={{color: AccBucMuteColor}}> <strong>BUC: </strong>{AccBucMute}</li>
