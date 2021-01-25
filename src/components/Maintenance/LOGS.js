@@ -1,10 +1,12 @@
 import React, { useEffect, useState } from "react";
-import { PageHeader, Table } from "antd";
+import { PageHeader, Button } from "antd";
 import sysIPAddress from "../../location";
 import useSessionstorage from "@rooks/use-sessionstorage";
+import DataTable from "react-data-table-component";
 import axios from "axios";
 import "../style/table.css";
 import fileDownload from "js-file-download";
+import { DownloadOutlined } from '@ant-design/icons';
 import Progress from "../Progress";
 
 const LOGS = () => {
@@ -19,24 +21,23 @@ const LOGS = () => {
   const [selectedRowKeys, setSelectedRowKeys] = useState([])
   const columns = [
     {
-      title: 'Modified Date',
-      dataIndex: 'ModifiedDate',
+      name: "Modified Date",
+      selector: "ModifiedDate",
+      sortable: false,
+      format: row => timeConverter(row.ModifiedDate)
     },
     {
-      title: 'File Size',
-      dataIndex: 'FileSize',
+      name: "File Size",
+      selector: "FileSize",
+      sortable: false
     },
     {
-      title: 'File Name',
-      dataIndex: 'FileName',
-    },
+      name: "File Name",
+      selector: "FileName",
+      sortable: false
+    }
   ];
-
-  const onSelectChange = (selectedRowKeys) => {
-    console.log('selectedRowKeys changed: ', selectedRowKeys);
-    setSelectedRowKeys({ selectedRowKeys });
-  };
-
+  
   function timeConverter(UNIX_timestamp) {
     let date;
     if (UNIX_timestamp !== null && UNIX_timestamp !== undefined) {
@@ -55,6 +56,7 @@ const LOGS = () => {
       })
       .then((res) => {
         setData(res.data.LogFilesList);
+        
         for (let i = 0; i < res.data.LogFilesList.length; i++) {
           dlProgress.push(0);
         }
@@ -63,6 +65,7 @@ const LOGS = () => {
   };
   useEffect(() => {
     loadData();
+
     return () => {};
   }, []);
 
@@ -102,76 +105,38 @@ const LOGS = () => {
       });
   };
   
-  const rowSelection = {
-    selectedRowKeys,
-    onChange: onSelectChange,
-    selections: [
-      Table.SELECTION_ALL,
-      Table.SELECTION_INVERT,
-      Table.SELECTION_NONE,
-      {
-        key: 'odd',
-        text: 'Select Odd Row',
-        onSelect: changableRowKeys => {
-          let newSelectedRowKeys = [];
-          newSelectedRowKeys = changableRowKeys.filter((key, index) => {
-            if (index % 2 !== 0) {
-              return false;
-            }
-            return true;
-          });
-          setSelectedRowKeys({ selectedRowKeys: newSelectedRowKeys });
-        },
-      },
-      {
-        key: 'even',
-        text: 'Select Even Row',
-        onSelect: changableRowKeys => {
-          let newSelectedRowKeys = [];
-          newSelectedRowKeys = changableRowKeys.filter((key, index) => {
-            if (index % 2 !== 0) {
-              return true;
-            }
-            return false;
-          });
-          setSelectedRowKeys({ selectedRowKeys: newSelectedRowKeys });
-        },
-      },
-    ],
+  function handleChange(e) {    
+    setSelectedRowKeys(e.selectedRows)
+    console.log(selectedRowKeys);
   };
+
+  function downloadSelectedFiles(){
+    if(selectedRowKeys){
+      selectedRowKeys.map((key)=>{
+        downloadFile(key["FileName"])
+      })
+    }
+  }
   return (
     <>
       <div className="content-wrapper">
         <PageHeader className="site-page-header" title="Logs" />
       </div>
       <div className="content-wrapper">
-      <Table rowSelection={rowSelection} columns={columns} dataSource={data} />
-        <table className="styled-table">
-          <thead>
-            <tr>
-              <th> Name</th>
-              <th> Size</th>
-              <th> Date modified</th>
-              <th> </th>
-            </tr>
-          </thead>
-          <tbody>
-            {data.map((value, index) => {
-              return (
-                <tr key={index}>
-                  <td>{value.FileName}</td>
-                  <td>{parseFloat(value.FileSize / 1000000).toFixed(2)} MB</td>
-                  <td>{timeConverter(value.ModifiedDate)}</td>
-                  <td style={{ textDecoration: "underline" }}>
-                    <a onClick={() => downloadFile(value.FileName)} href="#">
-                      Download
-                    </a>
-                  </td>
-                </tr>
-              );
-            })}
-          </tbody>
-        </table>
+      <DataTable
+          title="Logs File"
+          columns={columns}
+          data={data}
+          defaultSortField="FileName"
+          pagination
+          selectableRows
+          onSelectedRowsChange={handleChange}
+          highlightOnHover
+          pointerOnHover
+        />
+        <Button type="primary" icon={<DownloadOutlined />} size="large" onClick={downloadSelectedFiles} >
+          Download
+        </Button>
         <div>
           <p style={{ display: showProgress }}>
             {loading && <Progress percentage={downloadPercentage} />}
