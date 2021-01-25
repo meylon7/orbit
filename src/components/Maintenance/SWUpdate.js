@@ -177,7 +177,7 @@ const SWUpdate = () => {
 
   const activateForm = () => {
     if (window.confirm("After the activation the system will be rebooted automatically.\nWould you like to proceed?")) {
-
+setIfStbyVersionUploaded(false)
       const param = {
         MessageName: "HTMLFormUpdate",
         Parameters: {
@@ -191,7 +191,7 @@ const SWUpdate = () => {
           }, mode: 'cors'
         })
         .then((response) => {
-          console.log("Version has been activated successfully");
+          console.log("Version has been activated successfully. Disconnecting...");
         })
         .catch((err) => alert("Version activation Error"));
     }
@@ -199,7 +199,6 @@ const SWUpdate = () => {
   };
 
   useEffect(() => {
-    console.log('useEffect LoadVersions')
     LoadVersions();
   },[]);
 
@@ -285,7 +284,7 @@ const SWUpdate = () => {
             <thead></thead>
             <tbody>
               <tr style={{ color: "rgb(3, 79, 132)" }}>
-                <td style={TD}>Active Firmware Version:</td>
+                <td  colSpan='2'>Active Firmware Version:</td>
                 <td>
                   <label>
                     {" "}
@@ -299,7 +298,7 @@ const SWUpdate = () => {
                 <td colSpan="4"></td>
               </tr>
               <tr>
-                <td style={TD}>Standby Firmware Version:</td>
+                <td colSpan='2'>Standby Firmware Version:</td>
                 <td>
                   <label>
                     {" "}
@@ -320,7 +319,7 @@ const SWUpdate = () => {
                 </td>
               </tr>
               <tr>
-                <td colSpan="2">
+                <td colSpan="3">
                   &nbsp;
                   <Jumbotron>
                   <Form>
