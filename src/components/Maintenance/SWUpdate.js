@@ -276,7 +276,7 @@ setIfStbyVersionUploaded(false)
   return (
     <>
       <div className="content-wrapper">
-        <PageHeader className="site-page-header" title="SW Update" />
+        <PageHeader className="site-page-header" title="Firmware Update" />
       </div>
       <div className="content-wrapper">
         <div style={{ padding: "30px" }}>
