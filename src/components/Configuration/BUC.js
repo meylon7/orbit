@@ -299,7 +299,7 @@ const BUC = () => {
               Minimum Elevation
             </Space>
           </Col>
-          <Col span={8}>
+          <Col span={12}>
             <Space>
               {" "}
               <InputNumber
@@ -313,7 +313,7 @@ const BUC = () => {
             </Space>
           </Col>
 
-          <Col span={8}>
+          <Col span={4}>
             <Space>
               <Button type="primary" shape="round" size="large" onClick={postConditionalMute}>
                 Apply
@@ -336,8 +336,8 @@ const BUC = () => {
               />{" "}
           </Col>
           <Col span={9}>
-              <Collapse accordion >
-                <Panel header="Block Zone 1" key="1">
+              <Collapse  >
+                <Panel header="Block Zone 1" key="1" >
                   <Row>
                     <Col span={2}> Az<sub>1</sub> </Col>
                     <Col span={8}>
