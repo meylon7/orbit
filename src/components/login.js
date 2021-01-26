@@ -41,16 +41,9 @@ export default function Login(){
       .post("https://" + sysIPAddress + "/api/login", PostValue,{headers})
       .then((response) => {
         return response.data
-      //   if(response.statusText == "OK" && response.status >= 200 && response.status < 300) {
-      //     return response.data
-      // } else {
-      //     throw new Error("Server can't be reached!")
-      // }
       })
       .then((res) => {
         setToken(res.Token)
-       // actions({type:'setToken', payload:{...state,value: res.Token}})
-        //window.sessionStorage.setItem('isTokenh', res.Token);
         setUser(PostValue.UserName)
         window.location.reload(false);      
       })

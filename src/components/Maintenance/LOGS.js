@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { PageHeader, Button } from "antd";
+import { PageHeader, Button , message, Space } from "antd";
 import sysIPAddress from "../../location";
 import useSessionstorage from "@rooks/use-sessionstorage";
 import DataTable from "react-data-table-component";
@@ -37,7 +37,11 @@ const LOGS = () => {
       sortable: false
     }
   ];
-  
+  const headers = {
+    //'Access-Control-Origin': '*',
+    'Content-Type': 'text/plain',
+    Authorization: "Bearer " + token,
+  };
   function timeConverter(UNIX_timestamp) {
     let date;
     if (UNIX_timestamp !== null && UNIX_timestamp !== undefined) {
@@ -117,6 +121,48 @@ const LOGS = () => {
       })
     }
   }
+  const delteLogs = () => {
+    if(selectedRowKeys.length > 0){
+      selectedRowKeys.map((key)=>{
+        deletSelectedFiles(key["FileName"])
+      })
+    }else{
+      deletAll()
+    }
+  }
+  const deletSelectedFiles = (file) => {
+    axios
+      .post("https://" + sysIPAddress + "/api/files",file, { headers: {
+        Authorization: "Bearer " + token,
+      },mode:'cors' })
+      .then((res) => {
+        console.log(res)  
+      })
+      .catch((error) => {
+        console.error(error.message);
+        message.error("Delete file failed")
+      });
+  }
+
+  const deletAll = () => {
+    const param = {
+      MessageName: "HTMLFormUpdate",
+      Parameters: {
+        "ARM.ClearUserLog": true
+      },
+    };
+    axios
+      .post("https://" + sysIPAddress + "/api/files",param, { headers: {
+        Authorization: "Bearer " + token,
+      },mode:'cors' })
+      .then((response) => {
+        console.log(response)
+      })      
+      .catch((error) => {
+        console.error(error.message);
+        message.error("Delete files failed")
+      });
+  }
   return (
     <>
       <div className="content-wrapper">
@@ -134,11 +180,15 @@ const LOGS = () => {
           highlightOnHover
           pointerOnHover
         />
+        <Space size='small'>
         <Button type="primary" icon={<DownloadOutlined />} size="large" onClick={downloadSelectedFiles} >
           Download
         </Button>
+        <Button type="primary"  size="large" onClick={delteLogs} >
+          Delete logs file
+        </Button></Space>
         <div>
-          <p style={{ display: showProgress }}>
+          <p style={{ display: showProgress, marginTop: '20px' }}>
             {loading && <Progress percentage={downloadPercentage} />}
           </p>
         </div>

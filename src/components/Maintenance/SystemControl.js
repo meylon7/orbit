@@ -16,14 +16,9 @@ import {
   Switch,
 } from "antd";
 import axios from "axios";
-import { SocketContext } from "../../App";
 const SystemControl = () => {
   //////////////////////////////////////
   const [token] = useSessionstorage("token");
-  //const data = useContext(SocketContext);
-  //const [infoData, setInfoData] = useState([]);
-  let acuAutomatic = true
-  let bucAutomatic = true
   const [automatic, setAutomatic] = useState(true);
   const [manual, setManual] = useState(false);
   const [mode, setMode] = useState();
@@ -617,7 +612,7 @@ const SystemControl = () => {
       </div>
       <div className="content-wrapper">
         <div style={LABEL}>ACU</div>
-        <Accordion key={acuAutomatic} easing="ease" onChange={(e) => changeSysAutoManual(e.activeItems[0])}>
+        <Accordion accordion  easing="ease" onChange={(e) => changeSysAutoManual(e.activeItems[0])}>
           <AccordionItem title="Automatic" expanded={automatic}>
             <Row width="100%">
               <Col span={4} >
@@ -872,7 +867,7 @@ const SystemControl = () => {
           </AccordionItem>
         </Accordion>
         <div style={LABEL}>BUC MUTE</div>
-        <Accordion accordion onChange={(e) => changeBucAutoManual(e.activeItems[0])}>
+        <Accordion accordion easing="ease" onChange={(e) => changeBucAutoManual(e.activeItems[0])}>
           <AccordionItem title="Automatic" expanded={automaticBUC}>
           </AccordionItem>
           <AccordionItem title="Manual" key="2" expanded={manualBUC}>
