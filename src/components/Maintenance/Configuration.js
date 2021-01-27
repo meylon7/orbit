@@ -207,7 +207,7 @@ function onChange(value) {
         <PageHeader className="site-page-header" title="Configuration" />
       </div>
       <div className="content-wrapper">
-        <div className="steps-content">
+        <div className="page-content-no-background">
             {/* <h1>Upload Configuration</h1> */}
           <Select
             style={{ width: 300 }}

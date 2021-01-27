@@ -21,20 +21,21 @@ const LOGS = () => {
   const [selectedRowKeys, setSelectedRowKeys] = useState([])
   const columns = [
     {
+      name: "File Name",
+      selector: "FileName",
+      sortable: true
+    },
+    {
       name: "Modified Date",
       selector: "ModifiedDate",
-      sortable: false,
+      sortable: true,
       format: row => timeConverter(row.ModifiedDate)
     },
     {
       name: "File Size",
       selector: "FileSize",
-      sortable: false
-    },
-    {
-      name: "File Name",
-      selector: "FileName",
-      sortable: false
+      sortable: true,
+      format: row => parseFloat(row.FileSize/1000000).toFixed(2)+' MB'
     }
   ];
   const headers = {
@@ -114,37 +115,24 @@ const LOGS = () => {
     console.log(selectedRowKeys);
   };
 
-  function downloadSelectedFiles(){
-    if(selectedRowKeys){
+  const downloadSelectedFiles = () =>{
+    if(selectedRowKeys.length>0){
       selectedRowKeys.map((key)=>{
         downloadFile(key["FileName"])
       })
     }
+    else(
+      window.alert("No files selected to download...")
+    )
   }
-  const delteLogs = () => {
-    if(selectedRowKeys.length > 0){
-      selectedRowKeys.map((key)=>{
-        deletSelectedFiles(key["FileName"])
-      })
-    }else{
-      deletAll()
+  const deleteLogs = () => {
+    if(window.confirm("Are you sure you want to delete all log files?")){
+      deleteAll()
     }
   }
-  const deletSelectedFiles = (file) => {
-    axios
-      .post("https://" + sysIPAddress + "/api/files",file, { headers: {
-        Authorization: "Bearer " + token,
-      },mode:'cors' })
-      .then((res) => {
-        console.log(res)  
-      })
-      .catch((error) => {
-        console.error(error.message);
-        message.error("Delete file failed")
-      });
-  }
 
-  const deletAll = () => {
+
+  const deleteAll = () => {
     const param = {
       MessageName: "HTMLFormUpdate",
       Parameters: {
@@ -152,10 +140,12 @@ const LOGS = () => {
       },
     };
     axios
-      .post("https://" + sysIPAddress + "/api/files",param, { headers: {
+      .post("https://" + sysIPAddress + "/api/param/set",param, { headers: {
         Authorization: "Bearer " + token,
       },mode:'cors' })
       .then((response) => {
+        loadData()
+        message.success("Files deleted successfully")
         console.log(response)
       })      
       .catch((error) => {
@@ -170,7 +160,8 @@ const LOGS = () => {
       </div>
       <div className="content-wrapper">
       <DataTable
-          title="Logs File"
+          // title="Logs File"
+          fixedHeader={true}
           columns={columns}
           data={data}
           defaultSortField="FileName"
@@ -179,13 +170,16 @@ const LOGS = () => {
           onSelectedRowsChange={handleChange}
           highlightOnHover
           pointerOnHover
+          striped
+          responsive
+          paginationRowsPerPageOptions = {[10,20,30,40,50]}
         />
         <Space size='small'>
         <Button type="primary" icon={<DownloadOutlined />} size="large" onClick={downloadSelectedFiles} >
-          Download
+          Download selected files
         </Button>
-        <Button type="primary"  size="large" onClick={delteLogs} >
-          Delete logs file
+        <Button type="primary"  size="large" onClick={deleteLogs} >
+          Delete all logs files
         </Button></Space>
         <div>
           <p style={{ display: showProgress, marginTop: '20px' }}>

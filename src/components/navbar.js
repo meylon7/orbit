@@ -19,24 +19,28 @@ const Navbar = () => {
         >
           <Menu.Item key="1">
              <A href="/">System Status</A>
-          </Menu.Item>
-          <SubMenu key="sub1"  title="Configuration">
-            <Menu.Item key="10"><A href="/connectivity">Connectivity</A></Menu.Item>
-            <Menu.Item key="9"><A href="/buc">BUC</A></Menu.Item>
-          </SubMenu>
-          <SubMenu key="sub2" title="Maintenance">
-            <Menu.Item key="11"><A href="/syscontrol">System Control</A></Menu.Item>
-            <Menu.Item key="12"><A href="/swupdate">SW Update</A></Menu.Item>
-            <Menu.Item key="13"><A href="/logs">Logs</A></Menu.Item>
-            <Menu.Item key="14"><A href="/config">Config Management</A></Menu.Item>
-            <Menu.Item key="15"><A href="/calibration">Calibration Wizard</A></Menu.Item>
-          </SubMenu>
-          <Menu.Item key="16">
-            <A href="/about">
-              About
+              </Menu.Item>
+
+              <SubMenu key="sub2" title="Tools">
+                <Menu.Item key="11"><A href="/syscontrol">System Control</A></Menu.Item>
+                <Menu.Item key="17"><A href="/manualcontrol">Manual Control</A></Menu.Item>
+              </SubMenu>
+              <SubMenu key="sub1" title="Settings">
+                <Menu.Item key="10"><A href="/connectivity">Connectivity</A></Menu.Item>
+                <Menu.Item key="9"><A href="/buc">BUC Mute</A></Menu.Item>
+              </SubMenu>
+              <SubMenu key="sub3" title="Maintenance">
+                <Menu.Item key="13"><A href="/logs">Logs</A></Menu.Item>
+                <Menu.Item key="14"><A href="/config">Configuration Files</A></Menu.Item>
+                <Menu.Item key="12"><A href="/swupdate">Firmware Update</A></Menu.Item>
+                <Menu.Item key="15"><A href="/calibration">Calibration Wizard</A></Menu.Item>
+              </SubMenu>
+              <Menu.Item key="16">
+                <A href="/about">
+                  About
             </A>
-          </Menu.Item>
-        </Menu>
+              </Menu.Item>
+            </Menu>
           </div>
         </div>
         

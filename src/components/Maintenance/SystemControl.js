@@ -14,11 +14,24 @@ import {
   Select,
   Divider,
   Switch,
+  Radio,
+  Input
 } from "antd";
 import axios from "axios";
 const SystemControl = () => {
+
+  const radioStyle = {
+    display: 'block',
+    height: '30px',
+    lineHeight: '30px',
+  };
   //////////////////////////////////////
   const [token] = useSessionstorage("token");
+  //const data = useContext(SocketContext);
+  //const [infoData, setInfoData] = useState([]);
+  let acuAutomatic = true
+  let value = 1
+  let bucAutomatic = true
   const [automatic, setAutomatic] = useState(true);
   const [manual, setManual] = useState(false);
   const [mode, setMode] = useState();
@@ -31,7 +44,7 @@ const SystemControl = () => {
   const [altitude, setAltitude] = useState();
   const [txBand, setTxBand] = useState();
   const [rxBand, setRxBand] = useState();
-  const [txLO, setTxLO] = useState();
+  const [txLO, setTxLO] = useState('N/A');
   const [rxLO, setRxLO] = useState();
   const [showAzimuth, setShowAzimuth] = useState("block");
   const [showLongLat, setShowLongLat] = useState("none");
@@ -92,28 +105,38 @@ const SystemControl = () => {
         setLatitude(syscontroldata[0]["PNC.Sat.Lat"]);
         setAltitude(syscontroldata[0]["PNC.Sat.Alt"]);
 
-        setTxLO(syscontroldata[0]["BUC.TxLo"]);
-        setTxBandFromLo(syscontroldata[0]["BUC.TxLo"]);
+        // setTxLO(syscontroldata[0]["BUC.TxLo"]);
+
+        let tmp = syscontroldata[0]["BUC.TxLo"] !== undefined && syscontroldata[0]["BUC.TxLo"] !== null ? syscontroldata[0]["BUC.TxLo"] : 'N/A'
+        setTxLO(tmp)
+        console.log('txLo = ', txLO)
+        setTxBandFromLo(txLO);
 
         setRxLO(syscontroldata[0]["LNB.RxLo"]);
         setRxBandFromLo(syscontroldata[0]["LNB.RxLo"]);
 
-        setRxPol(syscontroldata[0]["LNB.RxPol"])
-        if (RxPol === "R") {
+        tmp = syscontroldata[0]["LNB.RxPol"] !== undefined && syscontroldata[0]["LNB.RxPol"] !== null ? syscontroldata[0]["LNB.RxPol"] : 'N/A'
+        console.log('LNB.RxPol = ', tmp)
+        if (tmp === "R") {
           setRxPol('RHCP')
-        } else {
+        } else if (tmp === "L"){
           setRxPol('LHCP')
         }
-        setTxPol(syscontroldata[0]["BUC.TxPol"])
+        else {
+          setRxPol('N/A')
+        }
+        setTxPol(syscontroldata[0]["BUC.TxPol"] !== undefined && syscontroldata[0]["BUC.TxPol"] !== null ? syscontroldata[0]["BUC.TxPol"] : 'N/A')
         if (TxPol === "R") {
           setTxPol('RHCP')
-        } else {
+        } else if (TxPol === "L"){
           setTxPol('LHCP')
+        }       else {
+          setTxPol('N/A')
         }
 
         setAutomaticBUC(!syscontroldata[0]["BUC.MuteManualEn"]);
         setmanualBUC(syscontroldata[0]["BUC.MuteManualEn"]);
-        setBucTxEnabled(syscontroldata[0]["BUC.TxEnabled"]);
+        setBucTxEnabled(syscontroldata[0]["BUC.TxEnabled"] !== undefined && syscontroldata[0]["BUC.TxEnabled"] !== null ? syscontroldata[0]["BUC.TxEnabled"] : false);
 
         setApplyStatus(syscontroldata[0]["SYS.ManualEn"]);
 
@@ -255,15 +278,22 @@ const SystemControl = () => {
   }
 
   const TxBandUpdate = (value) => {
-    console.log(value);
+    console.log('TxBandUpdate: ',value);
     if (value === "29-30") {
+      setTxBand(value)
       setRxBand("19.2-20.2");
       setTxLO("28.05");
       setRxLO("18.25");
-    } else {
+    } else if (value === "30-31") {
+      setTxBand(value)
       setRxBand("20.2 – 21.2");
       setTxLO("29");
       setRxLO("19.2");
+    }
+    else{
+      setRxBand("N/A");
+      setTxLO("N/A");
+      setRxLO("N/A");
     }
   };
 
@@ -274,6 +304,9 @@ const SystemControl = () => {
     else if (value === 29) {
       setTxBand("30 - 31")
     }
+    else{
+      setTxBand("N/A")
+    }
   }
   const setRxBandFromLo = (value) => {
     if (value === 18.25) {
@@ -281,6 +314,9 @@ const SystemControl = () => {
     }
     else if (value === 29) {
       setRxBand("20.2 – 21.2");
+    }
+    else{
+      setRxBand("N/A")
     }
   }
 
@@ -416,8 +452,8 @@ const SystemControl = () => {
       .then((res) => {
         console.log("Get", res.data);
         message.success('success')
-        setTxBandFromLo(res.data[0]["BUC.TxLo"])
-        setRxBandFromLo(res.data[0]["LNB.RxLo"])
+        setTxBandFromLo((res.data[0]["BUC.TxLo"] !== null) && (res.data[0]["BUC.TxLo"] !== undefined) ? res.data[0]["BUC.TxLo"]: 'N/A')
+        setRxBandFromLo((res.data[0]["LNB.RxLo"] !== null) && (res.data[0]["LNB.RxLo"] !== undefined) ? res.data[0]["LNB.RxLo"]: 'N/A')
         setUnsaved(true)
         setTopButtonColor('red')
 
@@ -438,17 +474,17 @@ const SystemControl = () => {
     setCurrentStepVal(e);
     setStep(e);
   };
-  const difineStepLength = () => {
+  const defineStepLength = () => {
     setStep(currentStepVal);
   };
-  const getRxPolarozation = (e) => {
+  const getRxPolarization = (e) => {
     if (e === "R") {
       setRxPol('RHCP')
     } else {
       setRxPol('LHCP')
     }
   };
-  const getTxPolarozation = (e) => {
+  const getTxPolarization = (e) => {
     if (e === "R") {
       setTxPol('RHCP')
     } else {
@@ -484,8 +520,9 @@ const SystemControl = () => {
         Authorization: "Bearer " + token,
       }, mode: 'cors'
     })
-      .then((response) => {
-        setBucTxEnabled(response.data[0]["BUC.TxEnabled"])
+      .then((res) => {
+        let temp = (res.data[0]["BUC.TxEnabled"] !== null) && (res.data[0]["BUC.TxEnabled"] !== undefined) ? res.data[0]["BUC.TxEnabled"]: false
+        setBucTxEnabled(temp)
 
       })
       .catch((error) => {
@@ -582,6 +619,7 @@ const SystemControl = () => {
       } else {
         setAutomatic(true);
         setManual(false);
+        key = 0
       }
 
     } else {
@@ -605,15 +643,20 @@ const SystemControl = () => {
     }
 
   }
+
+  const stam = e => {
+    console.log('radio checked', e.target.value);
+    value = e.target.value
+  };
   return (
     <>
       <div className="content-wrapper">
-        <PageHeader className="site-page-header" title="System Control" />
+        <PageHeader className="site-page-header" title="Manual Control" />
       </div>
       <div className="content-wrapper">
         <div style={LABEL}>ACU</div>
-        <Accordion accordion  easing="ease" onChange={(e) => changeSysAutoManual(e.activeItems[0])}>
-          <AccordionItem title="Automatic" expanded={automatic}>
+        <Accordion easing="ease" accordion onChange={(e) => changeSysAutoManual(e.activeItems[0])}>
+          <AccordionItem title="Automatic" key="1" expanded={automatic}>
             <Row width="100%">
               <Col span={4} >
                 <span style={LABEL}>Mode:</span>
@@ -643,7 +686,7 @@ const SystemControl = () => {
               </Row>
              
           </AccordionItem>
-          <AccordionItem title="Manual" expanded={manual}>
+          <AccordionItem title="Manual" key="2" expanded={manual}>
             <Divider orientation="left" style={LABEL}> Mode </Divider>
             <Row width="100%">
               <Col span={4} style={LABEL}>
@@ -712,7 +755,7 @@ const SystemControl = () => {
 
                   <Col span={6} style={{ display: showAzimuth }}>
                     <InputNumber
-                      id="difinestep"
+                      id="definestepAz"
                       defaultValue={0.1}
                       ref={stepLength}
                       onChange={setCurrentStep}
@@ -758,7 +801,7 @@ const SystemControl = () => {
                   </Col>
                   <Col span={6} style={{ display: showLongLat }}>
                     <InputNumber
-                      id="difinestep"
+                      id="definestepLon"
                       defaultValue={0.1}
                       ref={stepLength}
                       onChange={setCurrentStep}
@@ -799,7 +842,7 @@ const SystemControl = () => {
                         Tx Polarization:
                   </Col>
                       <Col span={8}>
-                        <Select style={{ width: 90 }} onChange={getTxPolarozation} value={TxPol}>
+                        <Select style={{ width: 90 }} onChange={getTxPolarization} value={TxPol}>
                           <Option value="R">RHCP</Option>
                           <Option value="L">LHCP</Option>
                         </Select>
@@ -813,7 +856,7 @@ const SystemControl = () => {
                         Rx Polarization:
                   </Col>
                       <Col span={8}>
-                        <Select style={{ width: 90 }} onChange={getRxPolarozation} value={RxPol}>
+                        <Select style={{ width: 90 }} onChange={getRxPolarization} value={RxPol}>
                           <Option value="R">RHCP</Option>
                           <Option value="L">LHCP</Option>
                         </Select>
@@ -867,15 +910,15 @@ const SystemControl = () => {
           </AccordionItem>
         </Accordion>
         <div style={LABEL}>BUC MUTE</div>
-        <Accordion accordion easing="ease" onChange={(e) => changeBucAutoManual(e.activeItems[0])}>
-          <AccordionItem title="Automatic" expanded={automaticBUC}>
+        <Accordion accordion onChange={(e) => changeBucAutoManual(e.activeItems[0])}>
+          <AccordionItem title="Automatic" key="3" expanded={automaticBUC}>
           </AccordionItem>
-          <AccordionItem title="Manual" key="2" expanded={manualBUC}>
+          <AccordionItem title="Manual" key="4" expanded={manualBUC}>
             {" "}
             <Row>
               <Col span={4}>
                 <Switch
-                  checkedChildren="Umuted"
+                  checkedChildren="Unmuted"
                   unCheckedChildren="Muted"
                   checked={bucTxEnabled}
                   onChange={changeTxEnabled}

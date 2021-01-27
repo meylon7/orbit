@@ -81,7 +81,7 @@ const Topbar = () => {
   const resetAcuBuc = () => {
     if (window.confirm("You are about to reset Antenna. Are you sure?")) {
       if(((window.sessionStorage.color).slice(1,-1)).contains('red')){
-        if(window.confirm("Save changes to memory?\nOtherwise they will be lost after the reboot")){
+        if(window.confirm("There are unsaved changes that will be lost after the reboot?\nSave changes to the memory?")){
           saveToMemory()
         }
       }
@@ -210,7 +210,7 @@ const Topbar = () => {
       })
 
 
-      if(unsaved){
+      if(buttonColor === 'red'){
         if(window.confirm("Save changes to memory?\nOtherwise they will be lost after the reboot")){
           saveToMemory()
         }
@@ -252,6 +252,8 @@ const Topbar = () => {
           })
   
           .then((res) => {
+          message.success('Logging out...')
+
             console.log("Post", res.data.Parameters);
             removeToken('token')
             removeUser('user')
