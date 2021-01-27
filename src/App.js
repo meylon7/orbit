@@ -16,6 +16,7 @@ import BUC from "./components/Configuration/BUC";
 import CalibrationWizard from "./components/Maintenance/CalibrationWizard";
 import Configuration from "./components/Maintenance/Configuration";
 import SystemControl from "./components/Maintenance/SystemControl";
+import ManualControl from "./components/Maintenance/ManualControl";
 import SWUpdate from "./components/Maintenance/SWUpdate";
 import LOGS from "./components/Maintenance/LOGS";
 import Dashboard from "./components/Dashboard";
@@ -185,6 +186,7 @@ const App = () => {
     "/buc": () => <BUC />,
     "/connectivity": () => <Connectivity />,
     "/syscontrol": () => <SystemControl />,
+    "/manualcontrol": () => <ManualControl />,
   };
   const match = useRoutes(routes);
   return (
