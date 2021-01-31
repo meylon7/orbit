@@ -77,7 +77,12 @@ export default function CalibrationWizard() {
  
 
    const [token, setToken, removeToken] = useSessionstorage('token');
-
+   const [user] = useSessionstorage('user');
+   useEffect(()=>{
+    if(user==="monitor") {
+      window.location.replace('/');
+    }
+   },[])
   const headers = {
     //'Access-Control-Origin': '*',
     'Content-Type': 'text/plain',
@@ -143,7 +148,6 @@ export default function CalibrationWizard() {
       content: <Finish />,
     },
   ];
-
 
   function next() {
     let x = 0
@@ -854,7 +858,6 @@ export default function CalibrationWizard() {
 
   };
 
-
   const checkStrkOffsets = () => {
     console.log(new Date(),'Starting checkStrkOffsets')
 
@@ -978,8 +981,6 @@ export default function CalibrationWizard() {
     }, 2000)
 
   };
-
-
 
   const saveToMemory = () => {
     console.log(new Date(),'Starting saveToMemory')

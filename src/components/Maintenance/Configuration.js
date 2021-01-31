@@ -52,8 +52,11 @@ const [fileSize, setFileSize] = useState(0)
 const [chunkCount, setChunkCount] = useState(0)
 const [beginingOfTheChunk, setBeginingOfTheChunk] = useState(0)
 const [endOfTheChunk, setEndOfTheChunk] = useState(chunkSize)
-
+const [user] = useSessionstorage('user');
 useEffect(() => {
+  if(user==="monitor") {
+    window.location.replace('/');
+  }
   initView(selectedValue)
   
 }, [])

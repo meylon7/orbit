@@ -1,12 +1,10 @@
-import React, { useRef, useContext } from "react";
+import React, { useRef,} from "react";
 import sysIPAddress from '../location'
 import axios from "axios";
 import { Form, Input, Button, Row, Col, message } from "antd";
 import { UserOutlined, LockOutlined } from "@ant-design/icons";
 import BackImage from "./pic/Login.png";
 import useSessionstorage from "@rooks/use-sessionstorage";
-import Context from "../store/contaxt";
-
 
 export default function Login(){
  // const {state, actions}= useContext(Context)
