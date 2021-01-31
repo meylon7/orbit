@@ -41,23 +41,27 @@ export default function Login(){
       .post("https://" + sysIPAddress + "/api/login", PostValue,{headers})
       .then((response) => {
         return response.data
-      //   if(response.statusText == "OK" && response.status >= 200 && response.status < 300) {
-      //     return response.data
-      // } else {
-      //     throw new Error("Server can't be reached!")
-      // }
+
       })
       .then((res) => {
         setToken(res.Token)
-       // actions({type:'setToken', payload:{...state,value: res.Token}})
-        //window.sessionStorage.setItem('isTokenh', res.Token);
         setUser(PostValue.UserName)
         window.location.reload(false);      
       })
       .catch((error) => {
-
-        console.error(error.message);
-        message.error("Login failed")
+        if((error.response === null || error.response === undefined)){
+          console.log("Login failed. Server can't be reached. error.response is null or undefined");
+          message.error("Login failed. Server can't be reached")
+        }
+        else if (error.response.status === 401) {
+          message.error("Login failed. Username or password is incorrect")
+          console.log("Login failed. Username or password is incorrect")
+          
+        } else 
+          {
+            console.log("Login failed");
+            message.error("Login failed")
+          }
       });
      
   };
@@ -100,7 +104,7 @@ export default function Login(){
                 ref={passRef}
                 id="password"
                 prefix={<LockOutlined className="site-form-item-icon" />}
-                type="password" value='gt56yh'
+                type="password"
                 placeholder="Password"
               />
             </Form.Item>
