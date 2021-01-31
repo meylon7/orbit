@@ -18,7 +18,6 @@ import {
   Input
 } from "antd";
 import axios from "axios";
-import { SocketContext } from "../../App";
 const SystemControl = () => {
 
   const radioStyle = {

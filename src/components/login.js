@@ -41,7 +41,6 @@ export default function Login(){
       .post("https://" + sysIPAddress + "/api/login", PostValue,{headers})
       .then((response) => {
         return response.data
-
       })
       .then((res) => {
         setToken(res.Token)

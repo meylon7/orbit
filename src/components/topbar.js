@@ -1,7 +1,8 @@
 import React, { useRef, useContext,useEffect, useState } from "react";
 import {SocketContext} from '../App'
 import './style/topbar.css'
-import logo from './pic/logo.png'
+import logo from './pic/Orbit_logo.png'
+// import logo from './pic/logo.png'
 import sysIPAddress from '../location'
 import useSessionstorage from "@rooks/use-sessionstorage";
 
@@ -136,6 +137,8 @@ const Topbar = () => {
     let manualEnabled = []
     let resetACUToAuto = false
     let resetBUCToAuto = false
+    message.success('Logging out...')
+
     axios
       .get("https://" + sysIPAddress + "/api/param/get?Parameters=SYS.ManualEn,BUC.MuteManualEn", {
         headers: {
@@ -252,7 +255,6 @@ const Topbar = () => {
           })
   
           .then((res) => {
-          message.success('Logging out...')
 
             console.log("Post", res.data.Parameters);
             removeToken('token')
@@ -290,7 +292,7 @@ const Topbar = () => {
                     <img src={logo} alt="orbit" style={LOGO} />
                 </div>
                 <div className="search-area">
-                   <strong style={{color:'rgb(3, 79, 132)', fontSize: '20px'}}>MPT-46WGX</strong> 
+                   <strong style={{color:'rgb(3, 79, 132)', fontSize: '20px'}}>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;MPT-46WGX</strong> 
                 </div>
                
             </div>
