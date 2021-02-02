@@ -14,6 +14,7 @@ const InfoPanel = () => {
   let AntennaOKColor = 'black'
   let BUCIsOKColor = 'black'
   let BUCAutomaticColor = 'black'
+  let AcuAutomaticColor = 'black'
   let BUCLockedColor = 'black'
   let SystemLockedColor = 'black'
 
@@ -44,6 +45,8 @@ const InfoPanel = () => {
 
    if (infoData["SYS.ManualEn"] === undefined || infoData["MDM.IsConnected"] === null) ManualEn = 'N/A'
    else ( ManualEn = infoData["SYS.ManualEn"] === false ? 'OpenAMIP' : 'Manual')
+   if(ManualEn ==='Manual') AcuAutomaticColor = 'red'
+   else AcuAutomaticColor = 'black'
 
     if (infoData["MDM.IsConnected"] === undefined || infoData["MDM.IsConnected"] === null) IsConnected = 'N/A'
    else (IsConnected = infoData["MDM.IsConnected"] === false ? 'Disconnected' : 'Connected' ) // IsConnected = 
@@ -190,7 +193,7 @@ const InfoPanel = () => {
         <li className='list-group-item' style={{color: AntennaOKColor}}> <strong>Antenna: </strong>{antena}</li>
         <li className='list-group-item' title={AntMode}> <strong>Mode: </strong>{AntMode}</li>
         <li className='list-group-item' style={{color: SystemLockedColor}}> <strong>System Locked: </strong>{SystemLocked}</li>
-        <li className='list-group-item' style={{ color: "black" }}> <strong>System Control: </strong>{ManualEn}</li>
+        <li className='list-group-item' style={{ color: AcuAutomaticColor }}> <strong>System Control: </strong>{ManualEn}</li>
         <li className='list-group-item'> <strong>Global Azimuth: </strong>{AzFdbkLLLN_360} [deg]</li>
         <li className='list-group-item'> <strong>Global Elevation: </strong>{ElFdbkLLLN_360} [deg]</li>
         <li className='list-group-item'> <strong>Satellite Lon: </strong>{Lon} [deg]</li>
