@@ -31,6 +31,7 @@ export const SocketContext = createContext();
 const App = () => {
 
   const [token, setToken, removeToken] = useSessionstorage('token');
+  const [user] = useSessionstorage('user');
   const [socketInfo, setSocketInfo] = useState([]);
   const [unsaved, setUnsaved, removeUnsaved] = useSessionstorage('unsavedConfigChanges');
   const [satLockState, setSatLockState, removeLockState] = useSessionstorage('SatLockState');
@@ -202,7 +203,8 @@ const App = () => {
                 {match || <NotFound />}
                 
               </div>
-              <InfoPanel />
+              {user === "manager" ? <InfoPanel /> : null}
+              
             </div>
             <footer>
                   <p>

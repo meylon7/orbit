@@ -30,6 +30,9 @@ const SystemControl = () => {
   //////////////////////////////////////
   const [token] = useSessionstorage("token");
   // moshe 31/01/21
+  const [bucAuto, setBucAuto] = useState(true);
+  const [bucManual, setBucManual] = useState(false);  
+  
   const [accAuto, setAccAuto] = useState(true);
   const [accManual, setAccManual] = useState(false);
   ////////////////
@@ -105,6 +108,8 @@ const SystemControl = () => {
 
         setAutomatic(!syscontroldata[0]["SYS.ManualEn"]);
         setManual(syscontroldata[0]["SYS.ManualEn"]);
+        setAccAuto(!syscontroldata[0]["SYS.ManualEn"])
+        setAccManual(syscontroldata[0]["SYS.ManualEn"])
         setMode(syscontroldata[0]["PNC.AntMode"]);
         setStepTrack(syscontroldata[0]["MDM.StepTrackEnabled"]);
 
@@ -158,6 +163,9 @@ const SystemControl = () => {
 
         setAutomaticBUC(!syscontroldata[0]["BUC.MuteManualEn"]);
         setmanualBUC(syscontroldata[0]["BUC.MuteManualEn"]);
+        setBucAuto(!syscontroldata[0]["BUC.MuteManualEn"]);
+        setBucManual(syscontroldata[0]["BUC.MuteManualEn"]);
+
         setBucTxEnabled(
           syscontroldata[0]["BUC.TxEnabled"] !== undefined &&
             syscontroldata[0]["BUC.TxEnabled"] !== null
@@ -503,7 +511,7 @@ const SystemControl = () => {
     fontWeight: "bold",
     color: "#034f84",
     fontWeight: "600",
-    fontSize: "14px",
+    fontSize: "16px",
   };
 
   const setCurrentStep = (e) => {
@@ -649,6 +657,10 @@ const SystemControl = () => {
             console.log("Post", response.data.Parameters);
             setAutomatic(false);
             setManual(true);
+
+            setAccAuto(false);
+            setAccManual(true);
+
             setTopButtonColor("red");
           })
           .catch((error) => {
@@ -657,6 +669,9 @@ const SystemControl = () => {
       } else {
         setAutomatic(true);
         setManual(false);
+
+        setAccAuto(true);
+        setAccManual(false);
         key = 0;
       }
     } else {
@@ -679,19 +694,114 @@ const SystemControl = () => {
     }
   };
 
-  const stam = (e) => {
-    console.log("radio checked", e.target.value);
-    value = e.target.value;
-  };
 
   // moshe 31/01/21
-  const toggleTab = (item) => {
+  const toggleAcuTab = (item) => {
+    let param    
     if (item === 1) {
       setAccAuto(true);
       setAccManual(false);
+      param = {
+        MessageName: "HTMLFormUpdate",
+        Parameters: {
+          "SYS.ManualEn": false,
+        },
+      };
+      axios
+      .post("https://" + sysIPAddress + "/api/param/set", param, { headers })
+      .then((response) => {
+        console.log("Post", response.data.Parameters);
+        setTopButtonColor('red')
+        LoadSystemControl()
+
+      })
+      .catch((error) => {
+        console.error(error);
+        message.error("Can't switch to automatic mode")
+      });
     } else {
-      setAccAuto(false);
-      setAccManual(true);
+      if(window.confirm("Switching system to manual control. Are you sure?")){
+        setAccAuto(false);
+        setAccManual(true);
+        param = {
+          MessageName: "HTMLFormUpdate",
+          Parameters: {
+            "SYS.ManualEn": true,
+          },
+        };
+        axios
+      .post("https://" + sysIPAddress + "/api/param/set", param, { headers })
+      .then((response) => {
+        console.log("Post", response.data.Parameters);
+        setTopButtonColor('red')
+        LoadSystemControl()
+
+      })
+      .catch((error) => {
+        console.error(error);
+        message.error("Can't switch to manual mode")
+      });
+      }
+
+    }
+    
+   
+  };
+  const toggleBucTab = (item) => {
+    let param
+    if (item === 1) {
+      setBucAuto(true);
+      setBucManual(false);
+      param = {
+        MessageName: "HTMLFormUpdate",
+        Parameters: {
+          "BUC.MuteManualEn": false
+        },
+      };
+      axios
+        .post("https://" + sysIPAddress + "/api/param/set", param, { headers })
+        .then((response) => {
+          console.log("Post", response.data.Parameters);
+          setTopButtonColor('red')
+          setBucAuto(true);
+          setBucManual(false);
+    
+
+        })
+        .catch((error) => {
+          console.error(error);
+          setBucAuto(false);
+          setBucManual(true);
+            message.error("Can't switch to automatic mode")
+
+        });
+    } else {
+      if (window.confirm("Switching BUC to manual mode. Are you sure?")) {
+        setBucAuto(false);
+        setBucManual(true);
+        param = {
+          MessageName: "HTMLFormUpdate",
+          Parameters: {
+            "BUC.MuteManualEn": true
+          },
+        };
+        axios
+          .post("https://" + sysIPAddress + "/api/param/set", param, { headers })
+          .then((response) => {
+            console.log("Post", response.data.Parameters);
+            setTopButtonColor('red')
+
+
+          })
+          .catch((error) => {
+            console.error(error);
+            setBucAuto(true);
+            setBucManual(false);
+            message.error("Can't switch to manual mode")
+
+          });
+      }
+
     }
   };
   /////////////////
@@ -701,48 +811,260 @@ const SystemControl = () => {
         <PageHeader className="site-page-header" title="ACU Control" />
       </div>
       <div className="content-wrapper">
-        <Radio.Group onChange={(e) => stam(e)} value={value}>
-          <Radio style={(radioStyle, LABEL)} value={1}>
-            Automatic
-          </Radio>
-          <div className="divider-line">&nbsp;</div>
+        <div className="wrapper">
+        <div className="accordion-wrapper">
+            <div
+              onClick={() => toggleAcuTab(1)}
+              className={`accordion-title ${accAuto ? "open" : ""}`}
+            >
+              Automatic
+            </div>
+            <div className={`accordion-item ${!accAuto ? "collapsed" : ""}`}>
+              <div className="accordion-content">
 
-          <Row width="100%">
-            <Col span={8}></Col>
+                <Row width="100%">
 
-            <Col span={8}>
-              <span style={LABEL}>Mode: </span>
-            </Col>
-            <Col span={8}>
-              <span style={LABEL}>OpenAMIP</span>
-            </Col>
-          </Row>
-          <div className="divider-line">&nbsp;</div>
+                  <Col span={6}>
+                    <span style={LABEL}>Mode:   OpenAMIP</span>
+                  </Col>
 
-          <Row width="100%">
-            <Col span={8}></Col>
+                  <Col span={14}>
+                    <Switch
+                      size="large"
+                      checkedChildren="Step Track On"
+                      unCheckedChildren="Step Track Off"
+                      checked={stepTrack}
+                      onChange={() => setStepTrack(!stepTrack)}
+                    />{" "}
+                  </Col>
+                  <Col span={1}>
+                    <Button shape="round" onClick={postStepTrack} type="primary">
+                      Apply
+                    </Button>
+                    </Col>
+                </Row>
+              </div>
+            </div>
 
-            <Col span={13}>
-              <Switch
-                size="large"
-                checkedChildren="Step Track On"
-                unCheckedChildren="Step Track Off"
-                checked={stepTrack}
-                onChange={() => setStepTrack(!stepTrack)}
-              />{" "}
-            </Col>
-            <Col span={3}>
-              <Button shape="round" onClick={postStepTrack} type="primary">
-                Apply
-              </Button>
-            </Col>
-          </Row>
-          <div className="divider-line">&nbsp;</div>
+            <div
+              onClick={() => toggleAcuTab(2)}
+              className={`accordion-title ${accManual ? "open" : ""}`}
+            >Manual</div>
+              <div
+                className={`accordion-item ${!accManual ? "collapsed" : ""}`}
+              >
+              <div className="accordion-content">
+              <Divider orientation="left" style={LABEL}> Mode </Divider>
+            <Row width="100%">
+              <Col span={4} style={LABEL}>
+                Mode:
+              </Col>
+              <Col span={16}>
+                <Select
+                  value={mode}
+                  style={{ width: 250 }}
+                  onChange={(e) => checkMode(e)}
+                  ref={selectmode}
+                >
+                  <Option value="Point">Point</Option>{" "}
+                  <Option value="Stabilized Point Search">
+                    Stabilized Point Search
+                  </Option>
+                  <Option value="Stabilized Point">Stabilized Point</Option>
+                  <Option value="Stabilized Point Step Track">
+                    Stabilized Point Step Track
+                  </Option>
+                  <Option value="Stabilized Point Peak">
+                    Stabilized Point Peak
+                  </Option>
+                  <Option value="Stabilized Satellite Search">
+                    Stabilized Satellite Search
+                  </Option>
+                  <Option value="Stabilized Satellite">
+                    Stabilized Satellite
+                  </Option>
+                  <Option value="Stabilized Satellite StepTrack">
+                    Stabilized Satellite StepTrack
+                  </Option>
+                  <Option value="Stabilized Satellite Peak">
+                    Stabilized Satellite Peak
+                  </Option>
+                  <Option value="Park">Park</Option>
+                  <Option value="Self-Test">Self-Test</Option>
+                  <Option value="Maintenance">Maintenance</Option>
+                  <Option value="Test Trajectory">Test Trajectory</Option>
+                </Select>
+              </Col>
+              <Col span={4}>
+                <span style={{ textAlign: "right" }}>
+                  <Button shape="round" onClick={updateSelect} type="primary">
+                    Apply
+                  </Button>
+                </span>
+              </Col>
+            </Row>
 
-          <Radio style={radioStyle} value={2}>
-            Manual
-          </Radio>
-        </Radio.Group>
+            <Row width="100%">
+              <Col span={24}>
+                {/* azimuth area */}
+
+                <Row>
+                  <Col span={4} style={{ display: showAzimuth }}>
+                    <span style={LABEL}>Azimuth:</span>
+                  </Col>
+                  <Col span={6} style={{ display: showAzimuth }}>
+                    <InputNumber value={azimuth} id="azimuthid" onChange={(e) => setAzimuth(e)} min={0} max={360} step={step} /> [deg]
+                  </Col>
+                  <Col span={4} style={{ display: showAzimuth }}>
+                    <span ><ToolOutlined />Step size:</span>
+                  </Col>
+
+                  <Col span={6} style={{ display: showAzimuth }}>
+                    <InputNumber
+                      id="definestepAz"
+                      defaultValue={0.1}
+                      ref={stepLength}
+                      onChange={setCurrentStep}
+                      min={0.1}
+                      max={10}
+                      step={0.1}
+                    />{" "} [deg]
+                  </Col>
+                  
+                </Row>
+                <Row>
+                  <Col span={4} style={{ display: showAzimuth }}>
+                    <span style={LABEL}>Elevation:</span>
+                  </Col>
+                  <Col span={17} style={{ display: showAzimuth }}>
+                    <InputNumber
+                      id="elevationid" value={elevation}
+                      min={0}
+                      max={90}
+                      step={step}
+                      onChange={(e) => setElevation(e)}
+                    /> [deg]
+                  </Col>
+                </Row>
+                <Row>
+                  <Col span={4} style={{ display: showLongLat }}>
+                    <span style={LABEL}>Longitude:</span>
+                  </Col>
+                  <Col style={{ display: showLongLat }} span={6}>
+                    <InputNumber
+                      id="longitudeid" value={longitude}
+                      min={0}
+                      max={360}
+                      step={step}
+                      onChange={(e) => setLongitude(e)}
+                    /> [deg]
+                  </Col>
+
+                  <Col span={4} style={{ display: showLongLat }}>
+                    <span ><ToolOutlined />Step size:</span>
+                  </Col>
+                  <Col span={6} style={{ display: showLongLat }}>
+                    <InputNumber
+                      id="definestepLon"
+                      defaultValue={0.1}
+                      ref={stepLength}
+                      onChange={setCurrentStep}
+                      min={0.1}
+                      max={10}
+                      step={0.1}
+                    />{" "}[deg]
+                  </Col>
+
+                </Row>
+                <Row >
+                  <Col span={4} style={{ display: showLongLat }}>
+                    <span style={LABEL}>Latitude:</span>
+                  </Col>
+                  <Col span={17} style={{ display: showLongLat }}>
+                    <InputNumber id="latitudeid" onChange={(e) => setLatitude(e)} value={latitude} min={0} max={90} step={step} /> [deg]
+                  </Col>
+                </Row>
+                <Row>
+                  <Col span={4} style={{ display: showLongLat }}>
+                    <span style={LABEL}>Altitude:</span>
+                  </Col>
+
+                  <Col span={17} style={{ display: showLongLat }}>
+                    <InputNumber id="altitudeid" onChange={(e) => setAltitude(e)} value={altitude} min={0} max={100000000} step={step} /> [m]
+                  </Col>
+                </Row>
+                <Row style={{ display: showPolarization, width: '100%' }}>
+                  <Col span={24}>
+                    <Row>
+                      <Col span={4} style={LABEL}>
+                        Tx Polarization:
+                  </Col>
+                      <Col span={8}>
+                        <Select style={{ width: 90 }} onChange={getTxPolarization} value={TxPol}>
+                          <Option value="R">RHCP</Option>
+                          <Option value="L">LHCP</Option>
+                        </Select>
+                      </Col>
+                    </Row></Col>
+                    
+                    <Col span={24}>
+                    <Row>
+                      <Col span={4} style={LABEL}>
+                        Rx Polarization:
+                  </Col>
+                      <Col span={8}>
+                        <Select style={{ width: 90 }} onChange={getRxPolarization} value={RxPol}>
+                          <Option value="R">RHCP</Option>
+                          <Option value="L">LHCP</Option>
+                        </Select>
+                      </Col>
+                    </Row></Col>
+                </Row>
+              </Col>
+            </Row>
+
+            <Divider orientation="left"  style={LABEL}>Band </Divider>
+            <Row>
+              <Col span={4} style={LABEL}>
+                Tx Band:
+              </Col>
+              <Col span={6}>
+                <Select style={{ width: 90 }} onChange={TxBandUpdate} value = {txBand}>
+                  <Option value="29-30" selected>29-30</Option>{" "}
+                  {/* mode: point slide 13 */}
+                  <Option value="30-31">30-31</Option>
+                  
+                </Select> [GHz]
+              </Col>
+              <Col span={2} style={LABEL}>
+                Tx LO:
+              </Col>
+              <Col span={8}>{txLO} [GHz]</Col>
+              <Col span={4}>
+                <Button shape="round" type="primary" onClick={postTxBand}>
+                  Apply
+                </Button>
+                {/* 
+                Apply button will call POST API with following values:
+                BUC.TxLo = 29, LNB.RxLo = 19.2
+                */}
+              </Col>
+            </Row>
+            <Row>
+              <Col span={4} style={LABEL}>
+                Rx Band:
+              </Col>
+              <Col span={6}>{rxBand}&nbsp;&nbsp;&nbsp;&nbsp;[GHz]</Col>
+              <Col span={2} style={LABEL}>
+                Rx LO:
+              </Col>
+              <Col span={8}>{rxLO} [GHz]</Col>
+              <Col span={4}></Col>
+            </Row>
+                </div>
+              </div>
+            </div>
+        </div>
       </div>
       <div className="content-wrapper">
         <PageHeader className="site-page-header" title="BUC Mute Control" />
@@ -752,32 +1074,41 @@ const SystemControl = () => {
       <div className="wrapper">
           <div className="accordion-wrapper">
             <div
-              onClick={() => toggleTab(1)}
-              className={`accordion-title ${accAuto ? "open" : ""}`}
-              onClick={() => toggleTab(1)}
+              onClick={() => toggleBucTab(1)}
+              className={`accordion-title ${bucAuto ? "open" : ""}`}
+              onChange={() => toggleBucTab(1)}
             >
             Automatic
             </div>
-              <div className={`accordion-item ${!accAuto ? "collapsed" : ""}`}>
+              <div className={`accordion-item ${!bucAuto ? "collapsed" : ""}`}>
                 <div className="accordion-content">
-                  Controlled by Modem
                 </div>
               </div>
             
             <div
-              onClick={() => toggleTab(2)}
-              className={`accordion-title ${accManual ? "open" : ""}`}
-              onClick={() => toggleTab(2)}
+              onClick={() => toggleBucTab(2)}
+              className={`accordion-title ${bucManual ? "open" : ""}`}
+              onClick={() => toggleBucTab(2)}
             >Manual</div>
               <div
-                className={`accordion-item ${!accManual ? "collapsed" : ""}`}
+                className={`accordion-item ${!bucManual ? "collapsed" : ""}`}
               >
-                <div className="accordion-content">
-                  Sunlight reaches Earth's atmosphere and is scattered in all
-                  directions by all the gases and particles in the air. Blue
-                  light is scattered more than the other colors because it
-                  travels as shorter, smaller waves. This is why we see a blue
-                  sky most of the time.
+              <div className="accordion-content">
+                <Row>
+                  <Col span={6}>
+                    <Switch
+                      checkedChildren="Unmuted"
+                      unCheckedChildren="Muted"
+                      checked={bucTxEnabled}
+                      onChange={changeTxEnabled}
+                    />
+                  </Col>
+                  <Col span={10}>
+                    <Button shape="round" onClick={ManualMute} type="primary">
+                      Apply
+                </Button>
+                  </Col>
+            </Row>
                 </div>
               </div>
             </div>

@@ -16,6 +16,7 @@ let initialStbyVersion = 'N/A'
 const SWUpdate = () => {
   const [activeSW, setActiveSW] = useState(false);
   const [token, setToken, removeToken] = useSessionstorage('token');
+  const [user] = useSessionstorage('user');
   const [version, setVersion] = useState();
   const [stbyversion, setStbyversion] = useState();
   const [name, setName] = useState("");
@@ -95,8 +96,6 @@ const SWUpdate = () => {
 
   };
 
-  
-  
   const selectFile = (e) => {
     const _file = e.target.files[0];
     setSelectedFile(_file)
@@ -173,8 +172,6 @@ const SWUpdate = () => {
     }
   }
 
-
-
   const activateForm = () => {
     if (window.confirm("After the activation the system will be rebooted automatically.\nWould you like to proceed?")) {
 setIfStbyVersionUploaded(false)
@@ -199,6 +196,9 @@ setIfStbyVersionUploaded(false)
   };
 
   useEffect(() => {
+    if(user==="monitor") {
+      window.location.replace('/');
+    }
     LoadVersions();
   },[]);
 

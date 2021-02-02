@@ -11,6 +11,7 @@ import Progress from "../Progress";
 
 const LOGS = () => {
   const [token] = useSessionstorage("token");
+  const [user] = useSessionstorage('user');
   const [data, setData] = useState([]);
   const [isOpen, setIsOpen] = useState(false);
   const [value, setValue] = useState("");
@@ -69,6 +70,9 @@ const LOGS = () => {
       });
   };
   useEffect(() => {
+    if(user==="monitor") {
+      window.location.replace('/');
+    }
     loadData();
 
     return () => {};
