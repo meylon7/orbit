@@ -601,3 +601,9 @@ footer {
     background-color: #fff !important;
     border-radius: .3rem;
 }
+.ant-col-16{
+	margin-bottom: 5px;
+}
+.ant-col-6{
+	margin-bottom: 5px;
+}
