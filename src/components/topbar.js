@@ -81,7 +81,7 @@ const Topbar = () => {
     
   const resetAcuBuc = () => {
     if (window.confirm("You are about to reset Antenna. Are you sure?")) {
-      if(((window.sessionStorage.color).slice(1,-1)).contains('red')){
+      if(((window.sessionStorage.color).slice(1,-1)) === 'red'){
         if(window.confirm("There are unsaved changes that will be lost after the reboot?\nSave changes to the memory?")){
           saveToMemory()
         }
