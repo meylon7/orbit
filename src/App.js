@@ -20,6 +20,7 @@ import ManualControl from "./components/Maintenance/ManualControl";
 import SWUpdate from "./components/Maintenance/SWUpdate";
 import LOGS from "./components/Maintenance/LOGS";
 import Dashboard from "./components/Dashboard";
+import DashboardSimple from "./components/DashboardSimple";
 import 'bootstrap/dist/css/bootstrap.min.css';
 const MAIN_AREA = {
   flex: 1,
@@ -93,6 +94,24 @@ const App = () => {
       "PNC.Arinc.ypri.TrackAng",
       "PNC.Arinc.ypri.Drift",
       "SYS.StbyVersion",
+      "PNC.DiSEqC.sts",
+      "PNC.Arinc.prucnt",
+      "PNC.Host.sts", //KPSU column	Overtemp :	STS_TMPERR   0x0100 only, 	Low Voltage : 	STS_PWRERR   0x0200  only
+      //Antenna column 	Overtemp 	STS_SDUOVRTEMP   0x0008, 	Low Voltage 
+      //INS/GPS i.	STS_IRUERR   0x0400, ii.	STS_GPSERR   0x0800
+      "PNC.Sdu.stsdat.Sts", //Antenna column
+      /* i.	STS_AZERR  0x0001
+      ii.	STS_ELERR  0x0002
+      iii.	STS_WGSWERR  0x0004
+      iv.	STS_NOCAL    0x0040
+      v.	STS_MEMERR   0x0080
+      vi.	STS_AZSHDN   0x0400
+      vii.	STS_ELSHDN   0x0800
+      viii.	STS_RFSWERR  0x1000
+      ix.	STS_OORERR   0x2000
+      x.	STS_PER_OC   0x4000
+      */
+     "PNC.SDUMsg.nummsg",
     ],
     TimerPeriod: 200,
     Protocol: "JSON",
@@ -178,7 +197,8 @@ const App = () => {
   }, [ws]);
 
   const routes = {
-    "/": () => <Dashboard />,
+    "/": () => <DashboardSimple />,
+    "/status": () => <Dashboard />,
     "/config": () => <Configuration />,
     "/about": () => <About />,
     "/calibration": () => <CalibrationWizard />,

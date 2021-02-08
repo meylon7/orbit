@@ -24,8 +24,9 @@ const Navbar = () => {
               </Menu.Item>
               {user === "manager" ? <>
               <SubMenu key="sub2" title="Tools">
-                <Menu.Item key="11"><A href="/syscontrol">System Control</A></Menu.Item>
+                {/* <Menu.Item key="11"><A href="/syscontrol">System Control</A></Menu.Item> */}
                 <Menu.Item key="17"><A href="/manualcontrol">Manual Control</A></Menu.Item>
+                {/* <Menu.Item key="18"><A href="/Dashboard">Dashboard</A></Menu.Item> */}
               </SubMenu>
               <SubMenu key="sub1" title="Settings">
                 <Menu.Item key="10"><A href="/connectivity">Connectivity</A></Menu.Item>
