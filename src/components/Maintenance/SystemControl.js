@@ -658,18 +658,13 @@ const SystemControl = () => {
         <Accordion easing="ease" accordion onChange={(e) => changeSysAutoManual(e.activeItems[0])}>
           <AccordionItem title="Automatic" key="1" expanded={automatic}>
             <Row width="100%">
-              <Col span={4} >
+              <Col span={2} >
                 <span style={LABEL}>Mode:</span>
               </Col>
               <Col span={4}>
               <span>OpenAMIP</span>
               </Col>
-            </Row>
-            <div className="divider-line">&nbsp;</div>
-            <div className="divider-line">&nbsp;</div>
-            
-              <Row>
-              <Col span={4} >
+              <Col span={14} >
               <Switch
                 size="large"
                 checkedChildren="Step Track On"
@@ -678,7 +673,7 @@ const SystemControl = () => {
                 onChange={() => setStepTrack(!stepTrack)}
               />{" "}
               </Col>
-              <Col span={8} >
+              <Col span={4} >
                 <Button shape="round" onClick={postStepTrack} type="primary">
                   Apply
               </Button>
