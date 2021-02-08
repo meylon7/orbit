@@ -44,6 +44,7 @@ const SystemControl = () => {
   const [mode, setMode] = useState();
   const [stepTrack, setStepTrack] = useState();
   const stepLength = useRef(0.1);
+  const stepLonLatLength = useRef(0.1);
   const [azimuth, setAzimuth] = useState();
   const [elevation, setElevation] = useState();
   const [longitude, setLongitude] = useState();
@@ -57,7 +58,7 @@ const SystemControl = () => {
   const [showLongLat, setShowLongLat] = useState("none");
   const [showPolarization, setShowPolarization] = useState("block");
   const [applyStatus, setApplyStatus] = useState("point");
-  const [step, setStep] = useState(null);
+  const [step, setStep] = useState(0.1);
   const [currentStepVal, setCurrentStepVal] = useState(0.1);
   const [TxPol, setTxPol] = useState();
   const [RxPol, setRxPol] = useState();
@@ -349,37 +350,81 @@ const SystemControl = () => {
 
   const updateSelect = () => {
     let param = "";
+    let userMessage = "";
     // setMode(mode)
     switch (applyStatus) {
       case "point": {
-        param = {
-          MessageName: "HTMLFormUpdate",
-          Parameters: {
-            "PNC.AntMode": {
-              Mode: mode,
-              Azimuth: parseFloat(azimuth),
-              Elevation: parseFloat(elevation),
-              RxPolarization: RxPol === "LHCP" ? "L" : "R",
-              TxPolarization: TxPol === "LHCP" ? "L" : "R",
+        if(TxPol === "N/A" || RxPol === "N/A" || azimuth === null){
+          if (azimuth === null) {
+            userMessage+= "Please set Azimuth\n";
+          }
+          if (elevation === null) {
+            userMessage+= "Please set Elevation\n";
+          }
+          if(TxPol === "N/A"){
+            userMessage+= "Please select Tx Polarization\n";
+          }
+          if (RxPol === "N/A") {
+            userMessage+= "Please select Rx Polarization\n";
+          }
+          window.alert(userMessage);
+        }else{
+          param = {
+            MessageName: "HTMLFormUpdate",
+            Parameters: {
+              "PNC.AntMode": {
+                Mode: mode,
+                Azimuth: parseFloat(azimuth),
+                Elevation: parseFloat(elevation),
+                RxPolarization: RxPol === "LHCP" ? "L" : "R",
+                TxPolarization: TxPol === "LHCP" ? "L" : "R",
+              },
             },
-          },
-        };
-        axios
-          .post("https://" + sysIPAddress + "/api/param/set", param, {
-            headers,
-          })
-          .then((response) => {
-            console.log("Post", response.data.Parameters);
-            message.success("success");
-            setUnsaved(true);
-            setTopButtonColor("red");
-          })
-          .catch((error) => {
-            console.error(error);
-          });
+          };
+          axios
+            .post("https://" + sysIPAddress + "/api/param/set", param, {
+              headers,
+            })
+            .then((response) => {
+              if (response.data.Parameters['PNC.AntMode'] !== null) {
+                console.log("Post", response.data.Parameters);
+                message.success("success");
+                setUnsaved(true);
+                setTopButtonColor("red");
+              } else {
+                message.error("Failed to set mode ", mode)
+              }
+
+            })
+            .catch((error) => {
+              console.error(error);
+              message.error("Failed to set mode ", mode)
+
+            });
+        }
+        
         break;
       }
       case "satellite": {
+        if(TxPol === "N/A" || RxPol === "N/A" || longitude === null || latitude === null || altitude === null){
+          if (longitude === null) {
+            userMessage+= "Please set Longitude\n";
+          }
+          if (latitude === null) {
+            userMessage+= "Please set Latitude\n";
+          }
+          if (altitude === null) {
+            userMessage+= "Please set Altitude\n";
+          }
+          if(TxPol === "N/A"){
+            userMessage+= "Please select Tx Polarization\n";
+          }
+          if (RxPol === "N/A") {
+            userMessage+= "Please select Rx Polarization\n";
+          }
+        
+          window.alert(userMessage);
+        }else{
         param = {
           MessageName: "HTMLFormUpdate",
           Parameters: {
@@ -398,14 +443,21 @@ const SystemControl = () => {
             headers,
           })
           .then((response) => {
-            console.log("Post", response.data.Parameters);
-            setUnsaved(true);
-            setTopButtonColor("red");
-            message.success("success");
+            if (response.data.Parameters['PNC.AntMode'] !== null) {
+              console.log("Post", response.data.Parameters);
+              message.success("success");
+              setUnsaved(true);
+              setTopButtonColor("red");
+            } else {
+              message.error("Failed to set mode ", mode)
+            }
           })
           .catch((error) => {
             console.error(error);
+            message.error("Failed to set mode ", mode)
+
           });
+        }
         break;
       }
       case "none": {
@@ -422,12 +474,19 @@ const SystemControl = () => {
             headers,
           })
           .then((response) => {
-            console.log("Post", response.data.Parameters);
-            setUnsaved(true);
-            message.success("success");
+            if (response.data.Parameters['PNC.AntMode'] !== null) {
+              console.log("Post", response.data.Parameters);
+              message.success("success");
+              setUnsaved(true);
+              setTopButtonColor("red");
+            } else {
+              message.error("Failed to set mode ", mode)
+            }
           })
           .catch((error) => {
             console.error(error);
+            message.error("Failed to set mode ", mode)
+
           });
         break;
       }
@@ -454,6 +513,9 @@ const SystemControl = () => {
   };
 
   const postTxBand = () => {
+    if(txBand === "N/A"){
+      window.alert("Please select Tx Band\n");
+    }else{
     const param = {
       MessageName: "HTMLFormUpdate",
       Parameters: {
@@ -472,6 +534,7 @@ const SystemControl = () => {
       .catch((error) => {
         console.error(error);
       });
+    }
   };
   const getBandOk = (param) => {
     let data = param;
@@ -517,6 +580,9 @@ const SystemControl = () => {
   const setCurrentStep = (e) => {
     setCurrentStepVal(e);
     setStep(e);
+  };
+  const setCurrentLonLatStep = (e) => {
+
   };
   const defineStepLength = () => {
     setStep(currentStepVal);
@@ -923,21 +989,21 @@ const SystemControl = () => {
                         />{" "}
                         [deg]
                       </Col>
-                      <Col span={4} style={{ display: showAzimuth }}>
+                      <Col span={4} style={{ display: "none" }}>{/*showAzimuth */}
                         <span>
                           <ToolOutlined />
                           Step size:
                         </span>
                       </Col>
 
-                      <Col span={6} style={{ display: showAzimuth }}>
+                      <Col span={6} style={{ display: "none" }}>{/*showAzimuth */}
                         <InputNumber
                           id="definestepAz"
                           defaultValue={0.1}
                           ref={stepLength}
                           onChange={setCurrentStep}
                           min={0.1}
-                          max={10}
+                          max={90}
                           step={0.1}
                         />{" "}
                         [deg]
@@ -975,17 +1041,17 @@ const SystemControl = () => {
                         [deg]
                       </Col>
 
-                      <Col span={4} style={{ display: showLongLat }}>
+                      <Col span={4} style={{ display: "none" }}>{/*showLongLat */}
                         <span>
                           <ToolOutlined />
                           Step size:
                         </span>
                       </Col>
-                      <Col span={6} style={{ display: showLongLat }}>
+                      <Col span={6} style={{ display: "none" }}>{/*showLongLat */}
                         <InputNumber
                           id="definestepLon"
                           defaultValue={0.1}
-                          ref={stepLength}
+                          ref={stepLonLatLength}
                           onChange={setCurrentStep}
                           min={0.1}
                           max={10}
@@ -1027,7 +1093,7 @@ const SystemControl = () => {
                         [m]
                       </Col>
                     </Row>
-                    <Row style={{ display: showPolarization, width: "100%" }}>
+                    <Row style={{ display: showPolarization}}>
                       <Col span={24}>
                         <Row>
                           <Col span={4} style={LABEL}>
@@ -1146,15 +1212,19 @@ const SystemControl = () => {
             <div className={`accordion-item ${!bucManual ? "collapsed" : ""}`}>
               <div className="accordion-content">
                 <Row>
-                  <Col span={6}>
+                <Col span={6}>
+                    <span style={LABEL}>Transmission:  </span>
+                  </Col>
+                  <Col span={14}>
                     <Switch
-                      checkedChildren="Unmuted"
-                      unCheckedChildren="Muted"
+                      size="large"
+                      checkedChildren="On (Unmute)"
+                      unCheckedChildren="Off (Mute)"
                       checked={bucTxEnabled}
                       onChange={changeTxEnabled}
                     />
                   </Col>
-                  <Col span={10}>
+                  <Col span={4}>
                     <Button shape="round" onClick={ManualMute} type="primary">
                       Apply
                     </Button>
