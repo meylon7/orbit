@@ -48,13 +48,14 @@ svg{
  .gmail-page {
 	 display: flex;
 	 flex-direction: column;
-	 height: 100vh;
+	 height: 97vh;
 	 overflow: hidden;
 }
  .page-content {
 	 display: flex;
 	 flex: 1;
 	 overflow: hidden;
+	 min-width: 250px;
 }
  .tab-bar {
 	 justify-content: space-between;
@@ -143,7 +144,7 @@ svg{
 	width: 215px;
 	font-size:12px;
     margin-top: 1px;
-    border-bottom: 1px solid #ddd;
+    border-bottom: 2px solid #ddd;
     justify-content: space-between;
 	padding: 10px;
 	margin-left: 2px;
@@ -401,7 +402,28 @@ svg{
 	 display: flex;
 	 flex-direction: column;
 }
- 
+
+ .flexbox-container {
+display: flex;
+flex-wrap: wrap;
+justify-content: flex-start;
+align-content: flex-start;
+;
+
+ }
+ .flexbox-item{
+	 height: fit-content;
+	 min-height: 200px;
+	 width: 200px;
+	 min-width: 130px;
+	 max-width: 220px;
+flex-basis: auto;
+	 text-overflow: clip;
+	 flex-grow: 1;
+	 padding: 0;
+margin: 0;
+ }
+
  .content-wrapper {
 	 /* display: flex; */
 	 padding: 10px;
@@ -409,6 +431,7 @@ svg{
 	 border-radius: 4px;
 	 background: #fff;
 	 margin-bottom: 10px;
+
 }
  .mail-content-wrapper {
 	 color: #909191;
