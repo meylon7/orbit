@@ -192,7 +192,7 @@ const InfoPanel = () => {
       <ul className='info-panel'>
         <li className='list-group-item' style={{color: AntennaOKColor}}> <strong>Antenna: </strong>{antena}</li>
         <li className='list-group-item' title={AntMode}> <strong>Mode: </strong>{AntMode}</li>
-        <li className='list-group-item' style={{color: SystemLockedColor}}> <strong>System Locked: </strong>{SystemLocked}</li>
+        {/* <li className='list-group-item' style={{color: SystemLockedColor}}> <strong>System Locked: </strong>{SystemLocked}</li> */}
         <li className='list-group-item' style={{ color: AcuAutomaticColor }}> <strong>System Control: </strong>{ManualEn}</li>
         <li className='list-group-item'> <strong>Global Azimuth: </strong>{AzFdbkLLLN_360} [deg]</li>
         <li className='list-group-item'> <strong>Global Elevation: </strong>{ElFdbkLLLN_360} [deg]</li>
