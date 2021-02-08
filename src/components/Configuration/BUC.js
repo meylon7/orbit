@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-
+import BackImage from '../../components/pic/diagram.jpg'
 import useSessionstorage from "@rooks/use-sessionstorage";
 import sysIPAddress from '../../location'
 import {
@@ -17,7 +17,7 @@ import {
   Select,
   Collapse
 } from "antd";
-import { createGlobalStyle } from "styled-components";
+import { Stage, Layer, Rect } from "react-konva";
 
 
 const BUC = () => {
@@ -27,14 +27,18 @@ const BUC = () => {
     fontWeight: '600',
     fontSize: '16px'
   };
-
- const [token, setToken, removeToken] = useSessionstorage('token');
+  const StageImage = {
+    backgroundImage: `url(${BackImage})`,
+    backgroundRepeat:'no-repeat'
+}
+ const [token] = useSessionstorage('token');
  const [unsaved, setUnsaved] = useSessionstorage('unsavedConfigChanges');
  const [topButtonColor, setTopButtonColor] = useSessionstorage('color')
  const { Panel } = Collapse;
   const [minElevation, setMinElevation] = useState();
   const [minElevationEn, setMinElevationEn] = useState();
-  
+  const stageHeight = 400
+  const stageWidth = 900
   const [bz1En, setBZ1] = useState(false);
   const [bz1AzLo, setbz1AzLo] = useState();
   const [bz1AzHi, setbz1AzHi] = useState();
@@ -81,9 +85,11 @@ const BUC = () => {
        'Content-Type': 'text/plain',
     Authorization: "Bearer " + token,
   };
+
   useEffect(() => {
     fetchData();
   }, []);
+  
   const fetchData = () => {
     axios
       .get(
@@ -154,7 +160,6 @@ const BUC = () => {
       });
       return bucdata;
   };
-  
   const postConditionalMute = () => {
     var BlockZoneEn = (bz1En === true ? 1 : 0) | (bz2En === true ? 2: 0) | (bz3En === true ? 4: 0) | (bz4En === true? 8: 0)
     const param = {
@@ -284,8 +289,11 @@ const BUC = () => {
         <PageHeader className="site-page-header" title="Conditional Mute" />
       </div>
       <div className="content-wrapper">
-      <Divider orientation="left" style={LABEL}> General definitions </Divider>
-      <div className="divider-line">&nbsp;</div>
+        <Divider orientation="left" style={LABEL}>
+          {" "}
+          General definitions{" "}
+        </Divider>
+        <div className="divider-line">&nbsp;</div>
         <Row>
           <Col span={8}>
             <Space>
@@ -309,13 +317,19 @@ const BUC = () => {
                 step={0.1}
                 onChange={(e) => setMinElevation(e)}
                 value={minElevation}
-              /> [deg]
+              />{" "}
+              [deg]
             </Space>
           </Col>
 
           <Col span={4}>
             <Space>
-              <Button type="primary" shape="round" size="large" onClick={postConditionalMute}>
+              <Button
+                type="primary"
+                shape="round"
+                size="large"
+                onClick={postConditionalMute}
+              >
                 Apply
               </Button>
             </Space>
@@ -323,91 +337,105 @@ const BUC = () => {
         </Row>
         <div className="divider-line">&nbsp;</div>
 
-        <Divider orientation="left" style={LABEL}> Blockage Zones definition </Divider>
+        <Divider orientation="left" style={LABEL}>
+          {" "}
+          Blockage Zones definition{" "}
+        </Divider>
         <div className="divider-line">&nbsp;</div>
 
         <Row id="bz1 and bz2">
           <Col span={2}>
-              <Switch
-                checkedChildren="On"
-                unCheckedChildren="Off"
-                checked={bz1En}
-                onChange={() => setBZ1(!bz1En)}
-              />{" "}
+            <Switch
+              checkedChildren="On"
+              unCheckedChildren="Off"
+              checked={bz1En}
+              onChange={() => setBZ1(!bz1En)}
+            />{" "}
           </Col>
           <Col span={9}>
-              <Collapse  >
-                <Panel header="Block Zone 1" key="1" >
-                  <Row>
-                    <Col span={2}> Az<sub>1</sub> </Col>
-                    <Col span={8}>
-                      <Space>
-                        {" "}
-                        <InputNumber
-                          id="bz1AzLo"
-                          min={0}
-                          max={360}
-                          step={0.1}
-                          onChange={(e) => setbz1AzLo(e)}
-                          value={bz1AzLo}
-                        ></InputNumber>
-                      </Space>
-                    </Col>
-                    <Col span={2}></Col>
-                    <Col span={2}> Az<sub>2</sub> </Col>
+            <Collapse>
+              <Panel header="Block Zone 1" key="1">
+                <Row>
+                  <Col span={2}>
+                    {" "}
+                    Az<sub>1</sub>{" "}
+                  </Col>
+                  <Col span={8}>
+                    <Space>
+                      {" "}
+                      <InputNumber
+                        id="bz1AzLo"
+                        min={0}
+                        max={360}
+                        step={0.1}
+                        onChange={(e) => setbz1AzLo(e)}
+                        value={bz1AzLo}
+                      ></InputNumber>
+                    </Space>
+                  </Col>
+                  <Col span={2}></Col>
+                  <Col span={2}>
+                    {" "}
+                    Az<sub>2</sub>{" "}
+                  </Col>
 
-                    <Col span={8}>
-                      <Space>
-                        {" "}
-                        <InputNumber
-                          id="bz1AzHi"
-                          padding={10}
-                          min={0}
-                          max={360}
-                          step={0.1}
-                          onChange={(e) => setbz1AzHi(e)}
-                          value={bz1AzHi}
-                        ></InputNumber>
-                      </Space>
-                    </Col>
-                  </Row>
-                  <div className="divider-line">&nbsp;</div>
+                  <Col span={8}>
+                    <Space>
+                      {" "}
+                      <InputNumber
+                        id="bz1AzHi"
+                        padding={10}
+                        min={0}
+                        max={360}
+                        step={0.1}
+                        onChange={(e) => setbz1AzHi(e)}
+                        value={bz1AzHi}
+                      ></InputNumber>
+                    </Space>
+                  </Col>
+                </Row>
+                <div className="divider-line">&nbsp;</div>
 
-                  <Row>
-
-                    <Col span={2}> El<sub>1</sub></Col>
-                    <Col span={8}>
-                      <Space>
-                        {" "}
-                        <InputNumber
-                          id="bz1ElLo"
-                          min={0}
-                          max={90}
-                          step={0.1}
-                          onChange={(e) => setbz1ElLo(e)}
-                          value={bz1ElLo}
-                        ></InputNumber>
-                      </Space>
-                    </Col>
-                    <Col span={2}></Col>
-                    <Col span={2}> El<sub>2</sub> </Col>
-                    <Col span={8}>
-                      <Space>
-                        {" "}
-                        <InputNumber
-                          id="bz1ElHi"
-                          min={0}
-                          max={90}
-                          step={0.1}
-                          //disabled={bz1ElHi}
-                          onChange={(e) => setbz1ElHi(e)}
-                          value={bz1ElHi}
-                        ></InputNumber>
-                      </Space>
-                    </Col>
-                  </Row>
-                </Panel>
-              </Collapse>
+                <Row>
+                  <Col span={2}>
+                    {" "}
+                    El<sub>1</sub>
+                  </Col>
+                  <Col span={8}>
+                    <Space>
+                      {" "}
+                      <InputNumber
+                        id="bz1ElLo"
+                        min={0}
+                        max={90}
+                        step={0.1}
+                        onChange={(e) => setbz1ElLo(e)}
+                        value={bz1ElLo}
+                      ></InputNumber>
+                    </Space>
+                  </Col>
+                  <Col span={2}></Col>
+                  <Col span={2}>
+                    {" "}
+                    El<sub>2</sub>{" "}
+                  </Col>
+                  <Col span={8}>
+                    <Space>
+                      {" "}
+                      <InputNumber
+                        id="bz1ElHi"
+                        min={0}
+                        max={90}
+                        step={0.1}
+                        //disabled={bz1ElHi}
+                        onChange={(e) => setbz1ElHi(e)}
+                        value={bz1ElHi}
+                      ></InputNumber>
+                    </Space>
+                  </Col>
+                </Row>
+              </Panel>
+            </Collapse>
           </Col>
           <Col span={1}></Col>
           <Col span={2}>
@@ -424,74 +452,86 @@ const BUC = () => {
           <Col span={9}>
             <Collapse accordion>
               <Panel header="Block Zone 2" key="1">
-                  <Row>
-                  <Col span={2}> Az<sub>1</sub> </Col>
-                    <Col span={8}>
-                      <Space>
-                        {" "}
-                        <InputNumber
-                          id="bz2AzLo"
-                          min={0}
-                          max={360}
-                          step={0.1}
-                          onChange={(e) => setbz2AzLo(e)}
-                          value={bz2AzLo}
-                        ></InputNumber>
-                      </Space>
-                    </Col>
-                    <Col span={2}></Col>
-                    <Col span={2}> Az<sub>2</sub> </Col>
+                <Row>
+                  <Col span={2}>
+                    {" "}
+                    Az<sub>1</sub>{" "}
+                  </Col>
+                  <Col span={8}>
+                    <Space>
+                      {" "}
+                      <InputNumber
+                        id="bz2AzLo"
+                        min={0}
+                        max={360}
+                        step={0.1}
+                        onChange={(e) => setbz2AzLo(e)}
+                        value={bz2AzLo}
+                      ></InputNumber>
+                    </Space>
+                  </Col>
+                  <Col span={2}></Col>
+                  <Col span={2}>
+                    {" "}
+                    Az<sub>2</sub>{" "}
+                  </Col>
 
-                    <Col span={8}>
-                      <Space>
-                        {" "}
-                        <InputNumber
-                          id="bz2AzHi"
-                          min={0}
-                          max={360}
-                          step={0.1}
-                          onChange={(e) => setbz2AzHi(e)}
-                          value={bz2AzHi}
-                        ></InputNumber>
-                      </Space>
-                    </Col>
-                  </Row>
-                  <div className="divider-line">&nbsp;</div>
+                  <Col span={8}>
+                    <Space>
+                      {" "}
+                      <InputNumber
+                        id="bz2AzHi"
+                        min={0}
+                        max={360}
+                        step={0.1}
+                        onChange={(e) => setbz2AzHi(e)}
+                        value={bz2AzHi}
+                      ></InputNumber>
+                    </Space>
+                  </Col>
+                </Row>
+                <div className="divider-line">&nbsp;</div>
 
-                  <Row>
-                  <Col span={2}> El<sub>1</sub> </Col>
-                    <Col span={8}>
-                      <Space>
-                        {" "}
-                        <InputNumber
-                          id="bz2ElLo"
-                          min={0}
-                          max={90}
-                          step={0.1}
-                          onChange={(e) => setbz2ElLo(e)}
-                          value={bz2ElLo}
-                        ></InputNumber>
-                      </Space>
-                    </Col>
-                    <Col span={2}></Col>
-                    <Col span={2}> El<sub>2</sub> </Col>
+                <Row>
+                  <Col span={2}>
+                    {" "}
+                    El<sub>1</sub>{" "}
+                  </Col>
+                  <Col span={8}>
+                    <Space>
+                      {" "}
+                      <InputNumber
+                        id="bz2ElLo"
+                        min={0}
+                        max={90}
+                        step={0.1}
+                        onChange={(e) => setbz2ElLo(e)}
+                        value={bz2ElLo}
+                      ></InputNumber>
+                    </Space>
+                  </Col>
+                  <Col span={2}></Col>
+                  <Col span={2}>
+                    {" "}
+                    El<sub>2</sub>{" "}
+                  </Col>
 
-                    <Col span={8}>
-                      <Space>
-                        {" "}
-                        <InputNumber
-                          id="bz2ElHi"
-                          min={0}
-                          max={90}
-                          step={0.1}
-                          onChange={(e) => setbz2ElHi(e)}
-                          value={bz2ElHi}
-                        ></InputNumber>
-                      </Space>
-                    </Col>
-                  </Row>
-                </Panel>
-              </Collapse>
+                  <Col span={8}>
+                    <Space>
+                      {" "}
+                      <InputNumber
+                        id="bz2ElHi"
+                        min={0}
+                        max={90}
+                        step={0.1}
+                        onChange={(e) => setbz2ElHi(e)}
+                        value={bz2ElHi}
+                      ></InputNumber>
+                    </Space>
+                  </Col>
+                </Row>
+              </Panel>
+            </Collapse>
           </Col>
         </Row>
         <div className="divider-line">&nbsp;</div>
@@ -500,85 +540,97 @@ const BUC = () => {
 
         <Row id="bz3 and bz4">
           <Col span={2}>
-              <Switch
-                size="large"
-                checkedChildren="On"
-                unCheckedChildren="Off"
-                checked={bz3En}
-                onChange={() => setBZ3(!bz3En)}
-              />
+            <Switch
+              size="large"
+              checkedChildren="On"
+              unCheckedChildren="Off"
+              checked={bz3En}
+              onChange={() => setBZ3(!bz3En)}
+            />
           </Col>
           <Col span={9}>
             <Collapse accordion>
-            <Panel header="Block Zone 3" key="1">
-                  <Row>
-                  <Col span={2}> Az<sub>1</sub> </Col>
-                    <Col span={8}>
-                      <Space>
-                        {" "}
-                        <InputNumber
-                          id="bz3AzLo"
-                          min={0}
-                          max={360}
-                          step={0.1}
-                          onChange={(e) => setbz3AzLo(e)}
-                          value={bz3AzLo}
-                        ></InputNumber>
-                      </Space>
-                    </Col>
-                    <Col span={2}></Col>
-                    <Col span={2}> Az<sub>2</sub> </Col>
+              <Panel header="Block Zone 3" key="1">
+                <Row>
+                  <Col span={2}>
+                    {" "}
+                    Az<sub>1</sub>{" "}
+                  </Col>
+                  <Col span={8}>
+                    <Space>
+                      {" "}
+                      <InputNumber
+                        id="bz3AzLo"
+                        min={0}
+                        max={360}
+                        step={0.1}
+                        onChange={(e) => setbz3AzLo(e)}
+                        value={bz3AzLo}
+                      ></InputNumber>
+                    </Space>
+                  </Col>
+                  <Col span={2}></Col>
+                  <Col span={2}>
+                    {" "}
+                    Az<sub>2</sub>{" "}
+                  </Col>
 
-                    <Col span={8}>
-                      <Space>
-                        {" "}
-                        <InputNumber
-                          id="bz3AzHi"
-                          min={0}
-                          max={360}
-                          step={0.1}
-                          onChange={(e) => setbz3AzHi(e)}
-                          value={bz3AzHi}
-                        ></InputNumber>
-                      </Space>
-                    </Col>
-                  </Row>
-                  <div className="divider-line">&nbsp;</div>
+                  <Col span={8}>
+                    <Space>
+                      {" "}
+                      <InputNumber
+                        id="bz3AzHi"
+                        min={0}
+                        max={360}
+                        step={0.1}
+                        onChange={(e) => setbz3AzHi(e)}
+                        value={bz3AzHi}
+                      ></InputNumber>
+                    </Space>
+                  </Col>
+                </Row>
+                <div className="divider-line">&nbsp;</div>
 
-                  <Row>
-                    <Col span={2}> El<sub>1</sub> </Col>
-                    <Col span={8}>
-                      <Space>
-                        {" "}
-                        <InputNumber
-                          id="bz3ElLo"
-                          min={0}
-                          max={90}
-                          step={0.1}
-                          onChange={(e) => setbz3ElLo(e)}
-                          value={bz3ElLo}
-                        ></InputNumber>
-                      </Space>
-                    </Col>
-                    <Col span={2}></Col>
-                    <Col span={2}> El<sub>2</sub> </Col>
+                <Row>
+                  <Col span={2}>
+                    {" "}
+                    El<sub>1</sub>{" "}
+                  </Col>
+                  <Col span={8}>
+                    <Space>
+                      {" "}
+                      <InputNumber
+                        id="bz3ElLo"
+                        min={0}
+                        max={90}
+                        step={0.1}
+                        onChange={(e) => setbz3ElLo(e)}
+                        value={bz3ElLo}
+                      ></InputNumber>
+                    </Space>
+                  </Col>
+                  <Col span={2}></Col>
+                  <Col span={2}>
+                    {" "}
+                    El<sub>2</sub>{" "}
+                  </Col>
 
-                    <Col span={8}>
-                      <Space>
-                        {" "}
-                        <InputNumber
-                          id="bz3ElHi"
-                          min={0}
-                          max={90}
-                          step={0.1}
-                          onChange={(e) => setbz3ElHi(e)}
-                          value={bz3ElHi}
-                        ></InputNumber>
-                      </Space>
-                    </Col>
-                  </Row>
-                </Panel>
-              </Collapse>
+                  <Col span={8}>
+                    <Space>
+                      {" "}
+                      <InputNumber
+                        id="bz3ElHi"
+                        min={0}
+                        max={90}
+                        step={0.1}
+                        onChange={(e) => setbz3ElHi(e)}
+                        value={bz3ElHi}
+                      ></InputNumber>
+                    </Space>
+                  </Col>
+                </Row>
+              </Panel>
+            </Collapse>
           </Col>
           <Col span={1}></Col>
           <Col span={2}>
@@ -594,123 +646,173 @@ const BUC = () => {
           </Col>
           <Col span={9}>
             <Collapse accordion>
-            <Panel header="Block Zone 4" key="1">
-                  <Row>
-                  <Col span={2}> Az<sub>1</sub> </Col>
-                    <Col span={8}>
-                      <Space>
-                        {" "}
-                        <InputNumber
-                          id="bz4AzLo"
-                          min={0}
-                          max={360}
-                          step={0.1}
-                          onChange={(e) => setbz4AzLo(e)}
-                          value={bz4AzLo}
-                        ></InputNumber>
-                      </Space>
-                    </Col>
-                    <Col span={2}></Col>
-                    <Col span={2}> Az<sub>2</sub> </Col>
+              <Panel header="Block Zone 4" key="1">
+                <Row>
+                  <Col span={2}>
+                    {" "}
+                    Az<sub>1</sub>{" "}
+                  </Col>
+                  <Col span={8}>
+                    <Space>
+                      {" "}
+                      <InputNumber
+                        id="bz4AzLo"
+                        min={0}
+                        max={360}
+                        step={0.1}
+                        onChange={(e) => setbz4AzLo(e)}
+                        value={bz4AzLo}
+                      ></InputNumber>
+                    </Space>
+                  </Col>
+                  <Col span={2}></Col>
+                  <Col span={2}>
+                    {" "}
+                    Az<sub>2</sub>{" "}
+                  </Col>
 
-                    <Col span={8}>
-                      <Space>
-                        {" "}
-                        <InputNumber
-                          id="bz4AzHi"
-                          min={0}
-                          max={360}
-                          step={0.1}
-                          onChange={(e) => setbz4AzHi(e)}
-                          value={bz4AzHi}
-                        ></InputNumber>
-                      </Space>
-                    </Col>
-                  </Row>
-                  <div className="divider-line">&nbsp;</div>
+                  <Col span={8}>
+                    <Space>
+                      {" "}
+                      <InputNumber
+                        id="bz4AzHi"
+                        min={0}
+                        max={360}
+                        step={0.1}
+                        onChange={(e) => setbz4AzHi(e)}
+                        value={bz4AzHi}
+                      ></InputNumber>
+                    </Space>
+                  </Col>
+                </Row>
+                <div className="divider-line">&nbsp;</div>
 
-                  <Row>
-                  <Col span={2}> El<sub>1</sub> </Col>
-                    <Col span={8}>
-                      <Space>
-                        {" "}
-                        <InputNumber
-                          id="bz4ElLo"
-                          min={0}
-                          max={90}
-                          step={0.1}
-                          onChange={(e) => setbz4ElLo(e)}
-                          value={bz4ElLo}
-                        ></InputNumber>
-                      </Space>
-                    </Col>
-                    <Col span={2}></Col>
-                    <Col span={2}> El<sub>2</sub> </Col>
-                    <Col span={8}>
-                      <Space>
-                        {" "}
-                        <InputNumber
-                          id="bz4ElHi"
-                          min={0}
-                          max={90}
-                          step={0.1}
-                          onChange={(e) => setbz4ElHi(e)}
-                          value={bz4ElHi}
-                        ></InputNumber>
-                      </Space>
-                    </Col>
-                  </Row>
-                </Panel>
-              </Collapse>
-
+                <Row>
+                  <Col span={2}>
+                    {" "}
+                    El<sub>1</sub>{" "}
+                  </Col>
+                  <Col span={8}>
+                    <Space>
+                      {" "}
+                      <InputNumber
+                        id="bz4ElLo"
+                        min={0}
+                        max={90}
+                        step={0.1}
+                        onChange={(e) => setbz4ElLo(e)}
+                        value={bz4ElLo}
+                      ></InputNumber>
+                    </Space>
+                  </Col>
+                  <Col span={2}></Col>
+                  <Col span={2}>
+                    {" "}
+                    El<sub>2</sub>{" "}
+                  </Col>
+                  <Col span={8}>
+                    <Space>
+                      {" "}
+                      <InputNumber
+                        id="bz4ElHi"
+                        min={0}
+                        max={90}
+                        step={0.1}
+                        onChange={(e) => setbz4ElHi(e)}
+                        value={bz4ElHi}
+                      ></InputNumber>
+                    </Space>
+                  </Col>
+                </Row>
+              </Panel>
+            </Collapse>
           </Col>
         </Row>
-        <Row  id="canvas">
-        <canvas id="myCanvas" width="200" height="100" style={{width: '200', height: '200', border: '1px', color: 'black'}}></canvas>
+        <Row id="canvas" >
+          <div style={StageImage}>
+          <Stage width={stageWidth} height={stageHeight}>
+            <Layer>
+              <Rect
+                x={30}
+                y={20}
+                width={200}
+                height={100}
+                fill="red"
+                draggable
+              />
+              <Rect
+                x={110}
+                y={120}
+                width={200}
+                height={100}
+                fill="blue"
+                draggable
+              />
+              <Rect
+                x={320}
+                y={250}
+                width={200}
+                height={100}
+                fill="green"
+                draggable
+              />
+              <Rect
+                x={520}
+                y={150}
+                width={200}
+                height={100}
+                fill="black"
+                draggable
+              />
+            </Layer>
+          </Stage>
+        </div>
         </Row>
-      </div>     
+      </div>
       <div className="content-wrapper" style={{ display: bucAttenShow }}>
         <PageHeader className="site-page-header" title="BUC Attenuation" />
       </div>
       <div className="content-wrapper" style={{ display: bucAttenShow }}>
-        <PageHeader className="site-page"/>
+        <PageHeader className="site-page" />
         <Row>
           <Col span={2}></Col>
-        <Col span={12}>
-          <Slider
-            min={0}
-            max={31}
-            step={0.25}
-            tooltipVisible
-            marks={marks}
-            onChange={(e) => setBucAttn(e)}
-            //value={typeof bucAttn === 'number' ? bucAttn : 0}
-            value={bucAttn}
-          />
-        </Col>
-        
-        <Col span={4}>
-          <InputNumber
-            min={0}
-            max={31}
-            step={0.25}
-            style={{ margin: '0 16px' }}
-            value={bucAttn}
-            onChange={(e) => setBucAttn(e)}
+          <Col span={12}>
+            <Slider
+              min={0}
+              max={31}
+              step={0.25}
+              tooltipVisible
+              marks={marks}
+              onChange={(e) => setBucAttn(e)}
+              //value={typeof bucAttn === 'number' ? bucAttn : 0}
+              value={bucAttn}
+            />
+          </Col>
 
-          />
-        </Col>
-        <Col span={1}>
-        <Space>
-              <Button type="primary" shape="round" size="large" onClick={postBucAttenuation}>
+          <Col span={4}>
+            <InputNumber
+              min={0}
+              max={31}
+              step={0.25}
+              style={{ margin: "0 16px" }}
+              value={bucAttn}
+              onChange={(e) => setBucAttn(e)}
+            />
+          </Col>
+          <Col span={1}>
+            <Space>
+              <Button
+                type="primary"
+                shape="round"
+                size="large"
+                onClick={postBucAttenuation}
+              >
                 Apply
               </Button>
             </Space>
-        </Col>
-
-      </Row>
+          </Col>
+        </Row>
       </div>
-   
     </>
   );
 };
